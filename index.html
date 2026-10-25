@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B5E20">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Registro Maurizio</title>
+<style>
+  :root{
+    --verde:#1B5E20; --verde-chiaro:#2E7D32; --sfondo:#F4F6F4;
+    --carta:#FFFFFF; --testo:#1A1A1A; --grigio:#757575; --rosso:#C62828;
+    /* Navy = colore "documentale" (riepiloghi, card Utilizzo API, PDF).
+       Il verde resta il colore delle azioni primarie. */
+    --navy:#1F3A5F; --navy-chiaro:#E6EBF2;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--sfondo); color:var(--testo); min-height:100vh;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    background:var(--verde); color:#fff; padding:14px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:10;
+  }
+  .hdr-left{ display:flex; align-items:center; gap:4px; }
+  header h1{ font-size:1.15rem; font-weight:600; cursor:pointer; }
+  #btnBack{ font-size:1.4rem; line-height:1; padding:4px 6px; }
+  header button{
+    background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer; padding:4px 8px;
+  }
+  main{ max-width:520px; margin:0 auto; padding:16px; }
+  .card{
+    background:var(--carta); border-radius:14px; padding:18px;
+    box-shadow:0 1px 4px rgba(0,0,0,.08); margin-bottom:16px;
+  }
+  h2{ font-size:1.02rem; margin-bottom:10px; }
+  .btn{
+    display:block; width:100%; padding:15px; border:none; border-radius:12px;
+    font-size:1.05rem; font-weight:600; cursor:pointer; text-align:center;
+  }
+  .btn-primario{ background:var(--verde); color:#fff; }
+  .btn-secondario{ background:#E8F0E8; color:var(--verde); margin-top:10px; }
+  .btn-pericolo{ background:#FBE9E9; color:var(--rosso); margin-top:10px; }
+  .btn:disabled{ opacity:.5; }
+  label{ display:block; font-size:.82rem; color:var(--grigio); margin:12px 0 4px; font-weight:600; }
+  input,select,textarea{
+    width:100%; padding:11px 12px; border:1px solid #D5D9D5; border-radius:10px;
+    font-size:1rem; background:#fff; font-family:inherit;
+  }
+  textarea{ resize:vertical; min-height:60px; }
+  .anteprima{ width:100%; border-radius:10px; max-height:260px; object-fit:contain; background:#EEE; }
+  .spinner{
+    margin:30px auto; width:42px; height:42px; border:4px solid #DDE5DD;
+    border-top-color:var(--verde); border-radius:50%; animation:gira .8s linear infinite;
+  }
+  .spinner-mini{
+    display:inline-block; width:18px; height:18px; border:3px solid #DDE5DD;
+    border-top-color:var(--verde); border-radius:50%; animation:gira .8s linear infinite;
+    vertical-align:middle;
+  }
+  @keyframes gira{ to{ transform:rotate(360deg);} }
+  .centro{ text-align:center; color:var(--grigio); }
+  .errore{ color:var(--rosso); font-size:.9rem; margin-top:10px; text-align:center; }
+  .ok-banner{
+    background:#E6F4E6; color:var(--verde); border-radius:12px; padding:14px;
+    text-align:center; font-weight:600; margin-bottom:16px;
+  }
+  .warn-banner{
+    background:#FFF3CD; color:#7A5A00; border-radius:12px; padding:12px 14px;
+    text-align:center; font-weight:600; margin-bottom:16px; font-size:.85rem;
+  }
+  .badge-ai{
+    display:inline-block; background:#FFF3CD; color:#7A5A00; font-size:.72rem;
+    padding:3px 8px; border-radius:99px; font-weight:600; margin-left:6px; vertical-align:middle;
+  }
+  .nascosto{ display:none !important; }
+  .riga-doppia{ display:flex; gap:10px; }
+  .riga-doppia > div{ flex:1; }
+  .mini-foto{ width:72px; height:72px; object-fit:cover; border-radius:8px; border:1px solid #DDD; }
+  .mini-pdf{
+    width:72px; height:72px; border-radius:8px; border:1px solid #DDD; background:#F4F6F4;
+    color:var(--verde); font-weight:700; font-size:.8rem;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .voce-lista{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:11px 4px; border-bottom:1px solid #EEE; gap:8px;
+  }
+  .voce-lista:last-child{ border-bottom:none; }
+  .voce-lista .vl-info{ min-width:0; }
+  .voce-lista .vl-negozio{ font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .voce-lista .vl-sub{ font-size:.78rem; color:var(--grigio); }
+  .voce-lista .vl-tot{ font-weight:700; white-space:nowrap; }
+  .voce-lista a{ color:var(--verde); font-weight:600; text-decoration:none; white-space:nowrap; }
+  #canvasEdit{ width:100%; border-radius:10px; background:#EEE; max-height:55vh; object-fit:contain; }
+  .toggle-riga{ display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
+  .toggle-riga span{ font-weight:600; font-size:.95rem; }
+  input[type="checkbox"]{ width:22px; height:22px; accent-color:var(--verde); }
+  input[type="range"]{ padding:0; accent-color:var(--verde); }
+  .griglia-home{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .tile{
+    aspect-ratio:1; border:none; border-radius:16px; cursor:pointer;
+    background:var(--carta); color:var(--verde);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    font-family:inherit; font-size:1rem; font-weight:600; text-align:center; padding:8px;
+    box-shadow:0 1px 4px rgba(0,0,0,.08);
+  }
+  .tile-icona{ font-size:2.4rem; }
+  .tile-primario{ background:var(--verde); color:#fff; }
+  .tile-entrata{ background:var(--navy); color:#fff; }
+  .tile-entrata .tile-icona{ filter:none; }
+  .badge-tipo{ display:inline-block; font-size:.72rem; font-weight:800; letter-spacing:.5px;
+    padding:3px 11px; border-radius:99px; color:#fff; background:var(--verde); margin-bottom:10px; }
+  .stat-riepilogo{ border:1px solid var(--navy-chiaro); border-radius:12px; padding:10px 14px; margin-bottom:14px; }
+  .sr-riga{ display:flex; justify-content:space-between; align-items:baseline; margin:5px 0; font-size:.92rem; }
+  .sr-ent{ color:var(--verde); font-weight:700; }
+  .sr-usc{ color:var(--rosso); font-weight:700; }
+  .sr-saldo{ border-top:1px solid var(--navy-chiaro); padding-top:6px; margin-top:6px; font-weight:800; color:var(--navy); }
+  .stat-sottotitolo{ font-weight:700; color:var(--navy); margin:4px 0 10px; font-size:.9rem; }
+  .tabella-spese{ width:100%; border-collapse:collapse; font-size:.85rem; }
+  .tabella-spese th{
+    text-align:left; color:var(--grigio); font-size:.72rem; text-transform:uppercase;
+    padding:6px 4px; border-bottom:2px solid #DDE5DD;
+  }
+  .tabella-spese td{ padding:9px 4px; border-bottom:1px solid #EEE; vertical-align:top; }
+  .tabella-spese td:first-child{ white-space:nowrap; color:var(--grigio); }
+  .tabella-spese td:nth-child(2){ word-break:break-word; }
+  .tabella-spese .num{ text-align:right; white-space:nowrap; font-weight:600; }
+  .tabella-spese .riga-totale td{ font-weight:700; border-top:2px solid #DDE5DD; border-bottom:none; }
+  .tabella-spese tbody tr:not(.riga-totale){ cursor:pointer; }
+  .voce-lista[data-riga]{ cursor:pointer; }
+  .hint-modifica{ font-size:.75rem; color:var(--grigio); text-align:center; margin-top:8px; }
+  .versione-info{
+    font-size:.78rem; color:var(--grigio); text-align:center;
+    margin-top:18px; padding-top:14px; border-top:1px solid #EEE; line-height:1.7;
+  }
+  .versione-info a{ color:var(--verde); font-weight:600; text-decoration:none; }
+  .seg{ display:flex; gap:0; border:1px solid #D5D9D5; border-radius:10px; overflow:hidden; }
+  .seg-btn{
+    flex:1; padding:10px; border:none; background:#fff; color:var(--grigio);
+    font-family:inherit; font-size:.95rem; font-weight:600; cursor:pointer;
+  }
+  .seg-btn.seg-attivo{ background:var(--verde); color:#fff; }
+  .stat-cat{ position:relative; }
+  .stat-cat .stat-barra{
+    position:absolute; left:0; top:0; bottom:0; background:#E8F0E8; border-radius:6px; z-index:0;
+  }
+  .stat-cat .stat-riga{
+    position:relative; z-index:1; display:flex; justify-content:space-between; align-items:baseline;
+    padding:9px 8px; gap:8px;
+  }
+  .stat-cat .stat-nome{ font-weight:600; }
+  .stat-cat .stat-perc{ font-size:.72rem; color:var(--grigio); margin-left:6px; font-weight:400; }
+  .stat-cat .stat-tot{ font-weight:700; white-space:nowrap; }
+  .stat-totale{
+    display:flex; justify-content:space-between; padding:11px 8px; margin-top:6px;
+    border-top:2px solid #DDE5DD; font-weight:700;
+  }
+  .allegati-box{ margin:2px 0 12px; }
+  .allegati-box a{
+    display:inline-block; background:#E8F0E8; color:var(--verde); font-weight:600;
+    text-decoration:none; padding:8px 12px; border-radius:10px; margin:4px 6px 0 0; font-size:.85rem;
+  }
+  /* Card "Utilizzo API" (stima) — accento navy documentale */
+  .box-uso{
+    margin-top:22px; padding:14px 16px; border:1px solid var(--navy-chiaro);
+    border-radius:14px; background:var(--navy-chiaro);
+  }
+  .uso-titolo{ font-weight:700; color:var(--navy); font-size:.95rem; margin-bottom:10px; }
+  .uso-riga{ display:flex; justify-content:space-between; align-items:baseline; margin:6px 0; font-size:.9rem; }
+  .uso-val{ font-weight:700; color:var(--navy); }
+  .uso-barra{ height:8px; border-radius:99px; background:#fff; overflow:hidden; margin:8px 0 4px; }
+  .uso-barra > div{ height:100%; width:0; background:var(--navy); transition:width .4s ease; }
+  .uso-ricarica{ display:flex; gap:8px; margin-top:12px; }
+  .uso-ricarica input{
+    flex:1; min-width:0; padding:9px 11px; border:1px solid var(--navy-chiaro);
+    border-radius:10px; background:#fff; color:var(--testo); font-size:.9rem;
+  }
+  .btn-ric{
+    border:none; border-radius:10px; padding:9px 14px; font-weight:700; font-size:.85rem;
+    cursor:pointer; background:var(--navy); color:#fff; white-space:nowrap;
+  }
+  .btn-ric5{ background:#fff; color:var(--navy); border:1px solid var(--navy); }
+  .uso-nota{ font-size:.78rem; color:var(--grigio); margin-top:10px; line-height:1.35; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-left">
+    <button id="btnBack" class="nascosto" title="Torna alla Home" aria-label="Torna alla Home">←</button>
+    <h1 id="btnHome">📒 Registro Maurizio</h1>
+  </div>
+  <button id="btnImpostazioni" title="Impostazioni">⚙️</button>
+</header>
+
+<main>
+
+  <div id="bannerOk" class="ok-banner nascosto"></div>
+  <div id="bannerWarn" class="warn-banner nascosto"></div>
+
+  <!-- ======== IMPOSTAZIONI ======== -->
+  <section id="vistaImpostazioni" class="card nascosto">
+    <h2>Impostazioni</h2>
+    <p class="centro" style="font-size:.85rem">Incolla l'URL della Web App di Apps Script e il token.</p>
+    <label>URL Web App</label>
+    <input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+    <label>Token API</label>
+    <input id="cfgToken" type="password" placeholder="token segreto">
+    <div style="margin-top:16px">
+      <button class="btn btn-primario" id="btnSalvaCfg">Salva e verifica</button>
+    </div>
+    <p id="cfgEsito" class="centro" style="margin-top:10px"></p>
+
+    <div class="box-uso" id="boxUso" hidden>
+      <div class="uso-titolo">Credito API (stima)</div>
+      <div class="uso-riga"><span>Credito residuo</span><span class="uso-val" id="usoResiduo">—</span></div>
+      <div class="uso-barra"><div id="usoBarra"></div></div>
+      <div class="uso-riga"><span>Consumo del mese</span><span class="uso-val" id="usoConsumo">—</span></div>
+      <div class="uso-ricarica">
+        <input id="usoImporto" type="text" inputmode="decimal" autocomplete="off" placeholder="importo $">
+        <button class="btn-ric" id="btnRicarica">Ricarica</button>
+        <button class="btn-ric btn-ric5" id="btnRicarica5">+ $5</button>
+      </div>
+      <p class="uso-nota" id="usoNota"></p>
+    </div>
+
+    <p class="versione-info">
+      App v<span id="appVersione"></span> · <span id="appData"></span><br>
+      <a id="linkChangelog" target="_blank" rel="noopener">📋 Novità e changelog</a>
+    </p>
+  </section>
+
+  <!-- ======== HOME ======== -->
+  <section id="vistaHome">
+    <div class="griglia-home">
+      <button class="tile tile-primario" id="btnFoto"><span class="tile-icona">📷</span>Spesa da foto</button>
+      <button class="tile" id="btnPdf"><span class="tile-icona">📄</span>Spesa da PDF</button>
+      <button class="tile tile-entrata" id="btnEntrata"><span class="tile-icona">💶</span>Aggiungi entrata</button>
+      <button class="tile" id="btnVaiElenco"><span class="tile-icona">📋</span>Movimenti del mese</button>
+      <button class="tile" id="btnVaiCerca"><span class="tile-icona">🔍</span>Cerca</button>
+      <button class="tile" id="btnVaiMese"><span class="tile-icona">📊</span>Rendiconto</button>
+      <button class="tile" id="btnVaiStat"><span class="tile-icona">📈</span>Statistiche</button>
+      <button class="tile" id="btnVaiImpostazioni"><span class="tile-icona">⚙️</span>Impostazioni</button>
+    </div>
+    <input id="inputFoto" class="nascosto" type="file" accept="image/*,application/pdf">
+    <input id="inputPdf" class="nascosto" type="file" accept="application/pdf">
+  </section>
+
+  <!-- ======== EDITOR FOTO (scansione B/N) ======== -->
+  <section id="vistaEditor" class="card nascosto">
+    <h2>Anteprima scansione</h2>
+    <canvas id="canvasEdit"></canvas>
+    <div class="toggle-riga" id="rigaCrop">
+      <span>Ritaglio automatico</span>
+      <input type="checkbox" id="toggleCrop" checked>
+    </div>
+    <div class="toggle-riga">
+      <span>Scansione B/N</span>
+      <input type="checkbox" id="toggleBN" checked>
+    </div>
+    <div id="boxContrasto">
+      <label>Contrasto: pulisce lo sfondo ⟷ recupera testo sbiadito</label>
+      <input type="range" id="sliderBN" min="5" max="30" value="15">
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn btn-primario" id="btnUsaFoto">✓ Usa questa immagine</button>
+      <button class="btn btn-secondario" id="btnAnnullaEditor">Annulla</button>
+    </div>
+  </section>
+
+  <!-- ======== ANALISI IN CORSO ======== -->
+  <section id="vistaAnalisi" class="card nascosto">
+    <div class="spinner"></div>
+    <p class="centro">L'AI sta leggendo lo scontrino…</p>
+  </section>
+
+  <!-- ======== FORM CONFERMA (uscita da scan / entrata manuale) ======== -->
+  <section id="vistaForm" class="card nascosto">
+    <span id="badgeTipo" class="badge-tipo"></span>
+    <img id="fotoAnteprima" class="anteprima nascosto" alt="anteprima giustificativo">
+    <p id="etichettaPdf" class="centro nascosto" style="margin-top:6px">📄 PDF allegato</p>
+    <span id="badgeAi" class="badge-ai nascosto">✨ compilato dall'AI — verifica</span>
+
+    <!-- allega giustificativo: solo per le ENTRATE (manuali, senza scan) -->
+    <div id="rigaDocEntrata" class="nascosto">
+      <label>Giustificativo (foto o PDF, facoltativo)</label>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn btn-secondario" id="btnDocEntrata" style="margin-top:0;flex:1">📎 Allega</button>
+        <img id="docEntrataAnteprima" class="mini-foto nascosto" alt="documento">
+        <span id="docEntrataPdfBadge" class="mini-pdf nascosto">📄 PDF</span>
+      </div>
+      <input id="inputDocEntrata" class="nascosto" type="file" accept="image/*,application/pdf">
+    </div>
+
+    <div class="riga-doppia">
+      <div>
+        <label>Data (GG/MM/AAAA)</label>
+        <input id="fData" type="text" inputmode="numeric" placeholder="12/06/2026">
+      </div>
+      <div>
+        <label>Importo</label>
+        <input id="fTotale" type="text" inputmode="decimal" placeholder="€ 12,34">
+      </div>
+    </div>
+    <p id="fDataHint" class="errore nascosto" style="margin-top:6px;text-align:left"></p>
+
+    <label>Descrizione</label>
+    <input id="fNegozio" type="text" placeholder="negozio o fonte (es. Pensione INPS)">
+
+    <label>Categoria</label>
+    <select id="fCategoria"></select>
+
+    <label>Note</label>
+    <textarea id="fNote" placeholder="facoltative"></textarea>
+
+    <label id="lblBancomat">Prova di pagamento/accredito — foto o PDF, facoltativo</label>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn btn-secondario" id="btnBancomat" style="margin-top:0;flex:1">💳 Aggiungi</button>
+      <img id="bancomatAnteprima" class="mini-foto nascosto" alt="prova pagamento">
+      <span id="bancomatPdfBadge" class="mini-pdf nascosto">📄 PDF</span>
+    </div>
+    <input id="inputBancomat" class="nascosto" type="file" accept="image/*,application/pdf">
+
+    <div style="margin-top:18px">
+      <button class="btn btn-primario" id="btnSalva">💾 Salva movimento</button>
+      <button class="btn btn-secondario" id="btnAnnulla">Annulla</button>
+    </div>
+    <p id="formErrore" class="errore nascosto"></p>
+  </section>
+
+  <!-- ======== MODIFICA SPESA SALVATA ======== -->
+  <section id="vistaModifica" class="card nascosto">
+    <h2>✏️ Modifica spesa</h2>
+    <p id="mBadgeAi" class="centro nascosto" style="font-size:.82rem;font-weight:600;color:var(--verde);margin-bottom:8px"></p>
+    <div id="mAllegati" class="allegati-box nascosto"></div>
+
+    <div class="riga-doppia">
+      <div>
+        <label>Data (GG/MM/AAAA)</label>
+        <input id="mData" type="text" inputmode="numeric" placeholder="12/06/2026">
+      </div>
+      <div>
+        <label>Importo</label>
+        <input id="mTotale" type="text" inputmode="decimal" placeholder="€ 12,34">
+      </div>
+    </div>
+    <p id="mDataHint" class="errore nascosto" style="margin-top:6px;text-align:left"></p>
+
+    <div class="riga-doppia">
+      <div>
+        <label>Tipo</label>
+        <select id="mTipo"><option>Uscita</option><option>Entrata</option></select>
+      </div>
+      <div>
+        <label>Categoria</label>
+        <select id="mCategoria"></select>
+      </div>
+    </div>
+
+    <label>Descrizione</label>
+    <input id="mNegozio" type="text">
+
+    <label>Note</label>
+    <textarea id="mNote"></textarea>
+
+    <label>Sostituisci giustificativo / pagamento (foto o PDF) — facoltativo</label>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn btn-secondario" id="btnMFoto" style="margin-top:0;flex:1">📄 Scontrino (foto o PDF)</button>
+      <img id="mFotoAnteprima" class="mini-foto nascosto" alt="nuova foto scontrino">
+      <span id="mFotoPdfBadge" class="mini-pdf nascosto">📄 PDF</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+      <button class="btn btn-secondario" id="btnMBancomat" style="margin-top:0;flex:1">💳 Pagamento (foto o PDF)</button>
+      <img id="mBancomatAnteprima" class="mini-foto nascosto" alt="nuova foto pagamento">
+      <span id="mBancomatPdfBadge" class="mini-pdf nascosto">📄 PDF</span>
+    </div>
+    <input id="inputMFoto" class="nascosto" type="file" accept="image/*,application/pdf">
+    <input id="inputMBancomat" class="nascosto" type="file" accept="image/*,application/pdf">
+
+    <div style="margin-top:18px">
+      <button class="btn btn-primario" id="btnSalvaMod">💾 Salva modifiche</button>
+      <button class="btn btn-secondario" id="btnAnnullaMod">Annulla</button>
+      <button class="btn btn-pericolo" id="btnEliminaMod">🗑️ Elimina movimento</button>
+    </div>
+    <p id="mErrore" class="errore nascosto"></p>
+  </section>
+
+  <!-- ======== ELENCO SPESE DEL MESE ======== -->
+  <section id="vistaElenco" class="nascosto">
+    <div class="card">
+      <h2>📋 Movimenti del mese</h2>
+      <label>Mese</label>
+      <input id="elencoMese" type="month">
+      <div id="boxElenco" style="margin-top:14px"></div>
+      <div style="margin-top:14px">
+        <button class="btn btn-secondario" id="btnIndietroElenco" style="margin-top:0">← Home</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== RICERCA ======== -->
+  <section id="vistaCerca" class="nascosto">
+    <div class="card">
+      <h2>🔍 Cerca spese</h2>
+      <label>Testo (negozio, categoria, note)</label>
+      <input id="cercaQuery" type="search" placeholder="es. hotel, taxi, Rossi…">
+      <label>Mese (facoltativo)</label>
+      <input id="cercaMese" type="month">
+      <div style="margin-top:14px">
+        <button class="btn btn-primario" id="btnCerca">Cerca</button>
+        <button class="btn btn-secondario" id="btnIndietroCerca">← Home</button>
+      </div>
+    </div>
+    <div class="card nascosto" id="cardRisultati">
+      <h2 id="risultatiTitolo">Risultati</h2>
+      <div id="listaRisultati"></div>
+    </div>
+  </section>
+
+  <!-- ======== CHIUSURA MESE ======== -->
+  <section id="vistaMese" class="nascosto">
+    <div class="card">
+      <h2>📊 Genera rendiconto</h2>
+      <p class="centro" style="font-size:.83rem">PDF con movimenti, entrate/uscite, saldo e giustificativi. Può richiedere fino a un minuto.</p>
+      <div class="seg">
+        <button id="rendMese" class="seg-btn seg-attivo">Mensile</button>
+        <button id="rendAnno" class="seg-btn">Annuale</button>
+      </div>
+      <div class="riga-doppia" style="margin-top:10px">
+        <div id="rendBoxMese">
+          <label>Mese</label>
+          <select id="meseSel"></select>
+        </div>
+        <div>
+          <label>Anno</label>
+          <select id="annoSel"></select>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn btn-primario" id="btnChiudiMese">🖨️ Genera rendiconto PDF</button>
+        <button class="btn btn-secondario" id="btnIndietroMese">← Home</button>
+      </div>
+      <p id="meseEsito" class="centro" style="margin-top:12px"></p>
+    </div>
+    <div class="card">
+      <h2>🗂️ Rendiconti generati</h2>
+      <div id="listaRiepiloghi"><p class="centro"><span class="spinner-mini"></span> caricamento…</p></div>
+    </div>
+  </section>
+
+  <!-- ======== STATISTICHE ======== -->
+  <section id="vistaStatistiche" class="nascosto">
+    <div class="card">
+      <h2>📈 Statistiche</h2>
+      <div class="seg">
+        <button id="statMese" class="seg-btn seg-attivo">Mese</button>
+        <button id="statAnno" class="seg-btn">Anno</button>
+      </div>
+      <div id="statBoxMese" style="margin-top:10px">
+        <label>Mese</label>
+        <input id="statInputMese" type="month">
+      </div>
+      <div id="statBoxAnno" class="nascosto" style="margin-top:10px">
+        <label>Anno</label>
+        <select id="statInputAnno"></select>
+      </div>
+      <div id="boxStat" style="margin-top:14px"></div>
+      <div style="margin-top:14px">
+        <button class="btn btn-secondario" id="btnIndietroStat" style="margin-top:0">← Home</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+"use strict";
+
+// ---------- configurazione ----------
+const cfg = {
+  get url(){ return localStorage.getItem("gs_url") || ""; },
+  set url(v){ localStorage.setItem("gs_url", v); },
+  get token(){ return localStorage.getItem("gs_token") || ""; },
+  set token(v){ localStorage.setItem("gs_token", v); }
+};
+
+// ---------- versione app ----------
+const APP = {
+  versione: "1.0.0",
+  data: "25/10/2026",
+  changelog: "https://github.com/demetriofarris/RegistroMaurizio/blob/main/CHANGELOG.md"
+};
+
+// Avvisa se il backend Apps Script è rimasto a una versione diversa dall'app
+// (causa tipica di "non funziona": codice ricopiato ma distribuzione non
+// aggiornata, o viceversa)
+function verificaVersioneBackend(versioneBackend){
+  const warn = document.getElementById("bannerWarn");
+  if (versioneBackend && versioneBackend !== APP.versione){
+    warn.textContent = "⚠️ Backend v" + versioneBackend + " ≠ app v" + APP.versione +
+      " — ricopia registro.js in Apps Script e crea una nuova versione della distribuzione";
+    warn.classList.remove("nascosto");
+  } else {
+    warn.classList.add("nascosto");
+  }
+}
+
+// ---------- stato corrente ----------
+let stato = { fotoB64: null, pdfB64: null, bancomatB64: null, bancomatIsPdf: false, testoAi: "" };
+
+// dati dell'editor foto
+let editor = { canvasFull: null, canvasCrop: null };
+
+// ---------- riferimenti DOM ----------
+const $ = (id) => document.getElementById(id);
+const viste = ["vistaHome", "vistaEditor", "vistaAnalisi", "vistaForm", "vistaModifica", "vistaElenco", "vistaCerca", "vistaMese", "vistaStatistiche", "vistaImpostazioni"];
+function mostra(vista){
+  viste.forEach(v => $(v).classList.toggle("nascosto", v !== vista));
+  // tasto "←" in alto: visibile in tutte le sotto-viste, nascosto sulla Home
+  $("btnBack").classList.toggle("nascosto", vista === "vistaHome");
+}
+
+// ---------- chiamate API ----------
+// POST senza Content-Type custom: evita il preflight CORS (pattern Apps Script).
+// Su rete mobile instabile Apps Script restituisce spesso 404/5xx transitori o
+// "Failed to fetch": le azioni SENZA effetti collaterali si ritentano in
+// automatico con backoff. Quelle che scrivono o consumano credito (salva,
+// aggiorna, elimina, analizza, chiudi_mese, ricarica) NON si ritentano, per non
+// duplicarne l'effetto (una scrittura potrebbe essere già andata a buon fine).
+const AZIONI_RIPETIBILI = ["ping", "cerca", "riepiloghi", "allegati", "usage"];
+async function api(body){
+  if (!cfg.url) throw new Error("Configura prima l'URL nelle impostazioni ⚙️");
+  body.token = cfg.token;
+  const tentativi = AZIONI_RIPETIBILI.includes(body.action) ? 3 : 1;
+  const transitori = [404, 408, 425, 429, 500, 502, 503, 504];
+  let ultimoErr;
+  for (let i = 0; i < tentativi; i++){
+    try {
+      const resp = await fetch(cfg.url, { method: "POST", body: JSON.stringify(body) });
+      if (resp.ok) return await resp.json();
+      if (!transitori.includes(resp.status)) throw new Error("HTTP " + resp.status);
+      ultimoErr = new Error("HTTP " + resp.status);   // status transitorio: ritento
+    } catch(e){
+      if (!(e instanceof TypeError)) throw e;          // non è errore di rete: propago
+      ultimoErr = e;                                   // "Failed to fetch": ritento
+    }
+    if (i < tentativi - 1) await new Promise(r => setTimeout(r, 500 * (i + 1) * (i + 1)));
+  }
+  throw ultimoErr;
+}
+
+// ---------- caricamento e ridimensionamento immagini ----------
+function caricaImmagine(file, maxLato = 1600){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scala = Math.min(maxLato / Math.max(img.width, img.height), 1);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scala);
+      canvas.height = Math.round(img.height * scala);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(img.src);
+      resolve(canvas);
+    };
+    img.onerror = () => reject(new Error("Immagine non leggibile"));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function fileInBase64(file){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(",")[1]);
+    r.onerror = () => reject(new Error("File non leggibile"));
+    r.readAsDataURL(file);
+  });
+}
+
+// Oltre ~20MB il PDF (in base64 +33%) supera i limiti di Apps Script/Claude
+// con errori poco chiari: meglio fermarsi subito con un messaggio esplicito
+function pdfTroppoGrande(file){
+  const MAX_MB = 20;
+  if (file.size > MAX_MB * 1024 * 1024){
+    alert("PDF troppo grande (" + Math.round(file.size / 1024 / 1024) + " MB): il limite è " + MAX_MB + " MB. Riduci il PDF o usa una foto.");
+    return true;
+  }
+  return false;
+}
+
+// ---------- scansione B/N (binarizzazione adattiva di Bradley) ----------
+// Per ogni pixel confronta la luminosità con la media della zona circostante
+// (calcolata in O(1) tramite immagine integrale): il testo resta nero netto,
+// lo sfondo — anche se ingiallito o in ombra — diventa bianco.
+function applicaScansioneBN(imageData, w, h, sensibilita){
+  const d = imageData.data;
+  const grigio = new Uint8ClampedArray(w * h);
+  for (let i = 0; i < w * h; i++){
+    grigio[i] = d[i*4]*0.299 + d[i*4+1]*0.587 + d[i*4+2]*0.114;
+  }
+  const integ = new Float64Array((w+1) * (h+1));
+  for (let y = 0; y < h; y++){
+    let sommaRiga = 0;
+    for (let x = 0; x < w; x++){
+      sommaRiga += grigio[y*w + x];
+      integ[(y+1)*(w+1) + (x+1)] = integ[y*(w+1) + (x+1)] + sommaRiga;
+    }
+  }
+  const s = Math.max(16, Math.floor(Math.min(w, h) / 12));  // raggio finestra
+  for (let y = 0; y < h; y++){
+    const y1 = Math.max(0, y-s), y2 = Math.min(h-1, y+s);
+    for (let x = 0; x < w; x++){
+      const x1 = Math.max(0, x-s), x2 = Math.min(w-1, x+s);
+      const n = (x2-x1+1) * (y2-y1+1);
+      const somma = integ[(y2+1)*(w+1)+(x2+1)] - integ[y1*(w+1)+(x2+1)]
+                  - integ[(y2+1)*(w+1)+x1]     + integ[y1*(w+1)+x1];
+      const v = (grigio[y*w+x] * n) < somma * (1 - sensibilita) ? 0 : 255;
+      const i4 = (y*w + x) * 4;
+      d[i4] = d[i4+1] = d[i4+2] = v;
+    }
+  }
+  return imageData;
+}
+
+// ---------- ritaglio automatico v2 (4 angoli + raddrizzamento prospettico) ----------
+// Come le app scanner: separa la carta dallo sfondo (soglia di Otsu), prende la
+// regione connessa più grande, ne calcola il guscio convesso e da lì i 4 angoli
+// del foglio (rettangolo ruotato di area minima → punto del guscio più vicino a
+// ogni angolo). Il quadrilatero viene poi raddrizzato con una trasformazione
+// prospettica. Restituisce null se il foglio non è riconoscibile o riempie già
+// l'inquadratura.
+
+// guscio convesso di un insieme di punti [x,y] (monotone chain)
+function guscioConvesso(punti){
+  punti.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o, a, b) => (a[0]-o[0])*(b[1]-o[1]) - (a[1]-o[1])*(b[0]-o[0]);
+  const basso = [];
+  for (const p of punti){
+    while (basso.length >= 2 && cross(basso[basso.length-2], basso[basso.length-1], p) <= 0) basso.pop();
+    basso.push(p);
+  }
+  const alto = [];
+  for (let i = punti.length - 1; i >= 0; i--){
+    const p = punti[i];
+    while (alto.length >= 2 && cross(alto[alto.length-2], alto[alto.length-1], p) <= 0) alto.pop();
+    alto.push(p);
+  }
+  basso.pop(); alto.pop();
+  return basso.concat(alto);
+}
+
+// trova i 4 angoli del foglio; restituisce [{x,y}×4] ordinati TL,TR,BR,BL
+// in coordinate dell'immagine piena, oppure null
+function rilevaQuadrilatero(canvas){
+  const w = 320, h = Math.max(1, Math.round(canvas.height * 320 / canvas.width));
+  const piccolo = document.createElement("canvas");
+  piccolo.width = w; piccolo.height = h;
+  const ctx = piccolo.getContext("2d");
+  ctx.drawImage(canvas, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  const tot = w * h;
+
+  // luminanza + istogramma
+  const lum = new Uint8ClampedArray(tot);
+  const hist = new Array(256).fill(0);
+  for (let i = 0; i < tot; i++){
+    const v = Math.round(d[i*4]*0.299 + d[i*4+1]*0.587 + d[i*4+2]*0.114);
+    lum[i] = v;
+    hist[v]++;
+  }
+
+  // soglia di Otsu (massimizza la varianza tra le due classi carta/sfondo)
+  let sommaTot = 0;
+  for (let v = 0; v < 256; v++) sommaTot += v * hist[v];
+  let sommaB = 0, pesoB = 0, maxVar = 0, soglia = 127;
+  for (let v = 0; v < 256; v++){
+    pesoB += hist[v];
+    if (!pesoB) continue;
+    const pesoF = tot - pesoB;
+    if (!pesoF) break;
+    sommaB += v * hist[v];
+    const mB = sommaB / pesoB, mF = (sommaTot - sommaB) / pesoF;
+    const varTra = pesoB * pesoF * (mB - mF) * (mB - mF);
+    if (varTra > maxVar){ maxVar = varTra; soglia = v; }
+  }
+
+  // maschera "carta": chiara e poco satura
+  const mask = new Uint8Array(tot);
+  for (let i = 0; i < tot; i++){
+    const sat = Math.max(d[i*4], d[i*4+1], d[i*4+2]) - Math.min(d[i*4], d[i*4+1], d[i*4+2]);
+    mask[i] = (lum[i] > soglia && sat < 80) ? 1 : 0;
+  }
+
+  // regione connessa più grande (BFS, 4-connettività), con gli estremi
+  // sinistro/destro di ogni riga: bastano quelli per il guscio convesso
+  const visitato = new Uint8Array(tot);
+  const coda = new Int32Array(tot);
+  let migliore = null;
+  for (let inizio = 0; inizio < tot; inizio++){
+    if (!mask[inizio] || visitato[inizio]) continue;
+    const rMin = new Int16Array(h).fill(w), rMax = new Int16Array(h).fill(-1);
+    let testa = 0, fine = 0, count = 0;
+    coda[fine++] = inizio;
+    visitato[inizio] = 1;
+    while (testa < fine){
+      const p = coda[testa++];
+      count++;
+      const px = p % w, py = (p / w) | 0;
+      if (px < rMin[py]) rMin[py] = px;
+      if (px > rMax[py]) rMax[py] = px;
+      if (px > 0   && mask[p-1] && !visitato[p-1]){ visitato[p-1] = 1; coda[fine++] = p-1; }
+      if (px < w-1 && mask[p+1] && !visitato[p+1]){ visitato[p+1] = 1; coda[fine++] = p+1; }
+      if (py > 0   && mask[p-w] && !visitato[p-w]){ visitato[p-w] = 1; coda[fine++] = p-w; }
+      if (py < h-1 && mask[p+w] && !visitato[p+w]){ visitato[p+w] = 1; coda[fine++] = p+w; }
+    }
+    if (!migliore || count > migliore.count){
+      migliore = { count, rMin, rMax };
+    }
+  }
+  if (!migliore || migliore.count < tot * 0.06) return null;   // foglio non riconosciuto
+
+  // punti di bordo della regione → guscio convesso
+  const punti = [];
+  for (let y = 0; y < h; y++){
+    if (migliore.rMax[y] < 0) continue;
+    punti.push([migliore.rMin[y], y]);
+    if (migliore.rMax[y] !== migliore.rMin[y]) punti.push([migliore.rMax[y], y]);
+  }
+  const guscio = guscioConvesso(punti);
+  if (guscio.length < 4) return null;
+
+  // rettangolo ruotato di area minima: prova la direzione di ogni lato del guscio
+  let best = null;
+  for (let i = 0; i < guscio.length; i++){
+    const [x1, y1] = guscio[i], [x2, y2] = guscio[(i+1) % guscio.length];
+    const len = Math.hypot(x2-x1, y2-y1);
+    if (!len) continue;
+    const ux = (x2-x1)/len, uy = (y2-y1)/len;
+    let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+    for (const [px, py] of guscio){
+      const u = px*ux + py*uy, v = -px*uy + py*ux;
+      if (u < minU) minU = u;
+      if (u > maxU) maxU = u;
+      if (v < minV) minV = v;
+      if (v > maxV) maxV = v;
+    }
+    const area = (maxU-minU) * (maxV-minV);
+    if (!best || area < best.area) best = { area, ux, uy, minU, maxU, minV, maxV };
+  }
+  if (!best) return null;
+
+  // angolo reale del foglio = punto del guscio più vicino a ogni angolo del rettangolo
+  const rett = [
+    [best.minU, best.minV], [best.maxU, best.minV],
+    [best.maxU, best.maxV], [best.minU, best.maxV]
+  ].map(([u, v]) => [u*best.ux - v*best.uy, u*best.uy + v*best.ux]);
+  const quad = rett.map(([rx, ry]) => {
+    let scelto = guscio[0], dMin = Infinity;
+    for (const p of guscio){
+      const dd = (p[0]-rx)*(p[0]-rx) + (p[1]-ry)*(p[1]-ry);
+      if (dd < dMin){ dMin = dd; scelto = p; }
+    }
+    return { x: scelto[0], y: scelto[1] };
+  });
+  for (let i = 0; i < 4; i++)
+    for (let j = i+1; j < 4; j++)
+      if (quad[i].x === quad[j].x && quad[i].y === quad[j].y) return null;
+
+  // controlli di sanità sull'area del quadrilatero (shoelace)
+  let area2 = 0;
+  for (let i = 0; i < 4; i++){
+    const p = quad[i], q = quad[(i+1) % 4];
+    area2 += p.x*q.y - q.x*p.y;
+  }
+  const areaQuad = Math.abs(area2) / 2;
+  if (areaQuad < tot * 0.04) return null;   // troppo piccolo: probabile falso positivo
+  if (areaQuad > tot * 0.90) return null;   // il foglio riempie già l'inquadratura
+
+  // ordina TL,TR,BR,BL: verso orario su schermo, partenza dall'angolo in alto a sinistra
+  if (area2 < 0) quad.reverse();
+  let iTL = 0;
+  for (let i = 1; i < 4; i++)
+    if (quad[i].x + quad[i].y < quad[iTL].x + quad[iTL].y) iTL = i;
+  quad.push(...quad.splice(0, iTL));
+
+  // margine 4% (espansione dal baricentro) e ritorno alle coordinate piene
+  const cx = (quad[0].x + quad[1].x + quad[2].x + quad[3].x) / 4;
+  const cy = (quad[0].y + quad[1].y + quad[2].y + quad[3].y) / 4;
+  const f = canvas.width / w;
+  return quad.map(p => ({
+    x: Math.min(canvas.width  - 1, Math.max(0, Math.round((cx + (p.x - cx) * 1.04) * f))),
+    y: Math.min(canvas.height - 1, Math.max(0, Math.round((cy + (p.y - cy) * 1.04) * f)))
+  }));
+}
+
+// raddrizza il quadrilatero in un rettangolo con una trasformazione prospettica:
+// proiettiva quadrato unitario → quadrilatero (formula di Heckbert), mappatura
+// inversa dal rettangolo di destinazione e campionamento bilineare
+function raddrizzaProspettiva(canvas, quad){
+  const [p0, p1, p2, p3] = quad;   // TL, TR, BR, BL
+  const W = Math.round(Math.max(Math.hypot(p1.x-p0.x, p1.y-p0.y), Math.hypot(p2.x-p3.x, p2.y-p3.y)));
+  const H = Math.round(Math.max(Math.hypot(p3.x-p0.x, p3.y-p0.y), Math.hypot(p2.x-p1.x, p2.y-p1.y)));
+  if (W < 40 || H < 40) return null;
+
+  const dx1 = p1.x-p2.x, dx2 = p3.x-p2.x, dy1 = p1.y-p2.y, dy2 = p3.y-p2.y;
+  const sx = p0.x-p1.x+p2.x-p3.x, sy = p0.y-p1.y+p2.y-p3.y;
+  const den = dx1*dy2 - dx2*dy1;
+  if (!den) return null;
+  const g = (sx*dy2 - sy*dx2) / den, hp = (dx1*sy - dy1*sx) / den;
+  const a = p1.x-p0.x+g*p1.x, b = p3.x-p0.x+hp*p3.x, c = p0.x;
+  const dq = p1.y-p0.y+g*p1.y, e = p3.y-p0.y+hp*p3.y, fq = p0.y;
+
+  const sw = canvas.width, sh = canvas.height;
+  const src = canvas.getContext("2d").getImageData(0, 0, sw, sh).data;
+  const out = document.createElement("canvas");
+  out.width = W; out.height = H;
+  const outCtx = out.getContext("2d");
+  const img = outCtx.createImageData(W, H);
+  const o = img.data;
+  for (let y = 0; y < H; y++){
+    const v = (y + 0.5) / H;
+    for (let x = 0; x < W; x++){
+      const u = (x + 0.5) / W;
+      const wq = g*u + hp*v + 1;
+      let xs = (a*u + b*v + c) / wq;
+      let ys = (dq*u + e*v + fq) / wq;
+      if (xs < 0) xs = 0; else if (xs > sw - 1.001) xs = sw - 1.001;
+      if (ys < 0) ys = 0; else if (ys > sh - 1.001) ys = sh - 1.001;
+      const x0 = xs | 0, y0 = ys | 0;
+      const fx = xs - x0, fy = ys - y0;
+      const i00 = (y0*sw + x0) * 4, i10 = i00 + 4, i01 = i00 + sw*4, i11 = i01 + 4;
+      const k = (y*W + x) * 4;
+      for (let ch = 0; ch < 3; ch++){
+        const top = src[i00+ch] + (src[i10+ch] - src[i00+ch]) * fx;
+        const bot = src[i01+ch] + (src[i11+ch] - src[i01+ch]) * fx;
+        o[k+ch] = top + (bot - top) * fy;
+      }
+      o[k+3] = 255;
+    }
+  }
+  outCtx.putImageData(img, 0, 0);
+  return out;
+}
+
+function aggiornaAnteprimaEditor(){
+  const cv = $("canvasEdit");
+  const ctx = cv.getContext("2d");
+  const usaCrop = editor.canvasCrop && $("toggleCrop").checked;
+  const sorgente = usaCrop ? editor.canvasCrop : editor.canvasFull;
+  cv.width = sorgente.width;
+  cv.height = sorgente.height;
+  ctx.drawImage(sorgente, 0, 0);
+  if ($("toggleBN").checked){
+    const img = ctx.getImageData(0, 0, cv.width, cv.height);
+    applicaScansioneBN(img, cv.width, cv.height, $("sliderBN").value / 100);
+    ctx.putImageData(img, 0, 0);
+  }
+  $("boxContrasto").classList.toggle("nascosto", !$("toggleBN").checked);
+}
+
+// ---------- flusso PDF condiviso (tasto "Carica PDF" e PDF da "Foto scontrino") ----------
+async function gestisciPdf(file){
+  if (pdfTroppoGrande(file)) return;
+  stato = { fotoB64: null, pdfB64: null, bancomatB64: null, bancomatIsPdf: false, testoAi: "" };
+  stato.pdfB64 = await fileInBase64(file);
+  $("fotoAnteprima").classList.add("nascosto");
+  $("etichettaPdf").classList.remove("nascosto");
+  // stessa esperienza delle foto: l'AI legge il PDF e precompila il form
+  mostra("vistaAnalisi");
+  let dati = null;
+  try {
+    const r = await api({ action: "analizza", pdf: stato.pdfB64 });
+    if (r.ok) dati = r.dati;
+  } catch (errAi) { /* analisi fallita: si compila a mano */ }
+  preparaForm(dati);
+  mostra("vistaForm");
+}
+
+// ---------- flusso foto: scatto → editor → AI → form ----------
+$("btnFoto").onclick = () => $("inputFoto").click();
+
+$("inputFoto").onchange = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    // un PDF scelto qui salta l'editor di scansione e usa il flusso PDF
+    // (comodo: la maggior parte degli scontrini arriva già in PDF dallo scanner)
+    if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)){
+      await gestisciPdf(file);
+      return;
+    }
+    editor.canvasFull = await caricaImmagine(file);
+    const quad = rilevaQuadrilatero(editor.canvasFull);
+    editor.canvasCrop = quad ? raddrizzaProspettiva(editor.canvasFull, quad) : null;
+    // la riga "Ritaglio automatico" compare solo se il foglio è stato trovato
+    $("rigaCrop").classList.toggle("nascosto", !editor.canvasCrop);
+    $("toggleCrop").checked = true;
+    $("toggleBN").checked = true;
+    $("sliderBN").value = 15;
+    aggiornaAnteprimaEditor();
+    mostra("vistaEditor");
+  } catch (err) {
+    alert("Errore: " + err.message);
+  }
+};
+
+$("toggleCrop").onchange = aggiornaAnteprimaEditor;
+$("toggleBN").onchange = aggiornaAnteprimaEditor;
+let timerSlider = null;
+$("sliderBN").oninput = () => {
+  clearTimeout(timerSlider);
+  timerSlider = setTimeout(aggiornaAnteprimaEditor, 120);
+};
+
+$("btnAnnullaEditor").onclick = () => mostra("vistaHome");
+
+$("btnUsaFoto").onclick = async () => {
+  stato = { fotoB64: null, pdfB64: null, bancomatB64: null, bancomatIsPdf: false, testoAi: "" };
+  // l'immagine scelta (B/N o originale) è quella già sul canvas
+  const qualita = $("toggleBN").checked ? 0.92 : 0.85;  // il B/N comprime benissimo
+  stato.fotoB64 = $("canvasEdit").toDataURL("image/jpeg", qualita).split(",")[1];
+  $("fotoAnteprima").src = "data:image/jpeg;base64," + stato.fotoB64;
+  $("fotoAnteprima").classList.remove("nascosto");
+  $("etichettaPdf").classList.add("nascosto");
+
+  mostra("vistaAnalisi");
+  let dati = null;
+  try {
+    const r = await api({ action: "analizza", foto: stato.fotoB64, fotoMime: "image/jpeg" });
+    if (r.ok) dati = r.dati;
+  } catch (errAi) { /* analisi fallita: si compila a mano */ }
+
+  preparaForm(dati);
+  mostra("vistaForm");
+};
+
+// ---------- flusso PDF ----------
+$("btnPdf").onclick = () => $("inputPdf").click();
+
+$("inputPdf").onchange = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    await gestisciPdf(file);
+  } catch (err) {
+    alert("Errore: " + err.message);
+  }
+};
+
+// ---------- controllo data anomala ----------
+// Una spesa è di norma del mese corrente o vicino: se la data dista più di un
+// mese da oggi (tipico: anno letto male dallo scontrino sbiadito, es. 2023
+// invece di 2026), l'avviso la rende evidente prima del salvataggio.
+function controllaDataAnomala(valore, hintId){
+  const hint = $(hintId);
+  let msg = "";
+  const m = String(valore || "").trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m){
+    const oggi = new Date();
+    const diffMesi = (oggi.getFullYear() * 12 + oggi.getMonth()) - ((+m[3]) * 12 + (+m[2] - 1));
+    if (diffMesi > 1 || diffMesi < -1){
+      msg = "⚠️ Data lontana da oggi: controlla l'anno (" + m[3] + ")";
+    }
+  }
+  hint.textContent = msg;
+  hint.classList.toggle("nascosto", !msg);
+}
+$("fData").oninput = () => controllaDataAnomala($("fData").value, "fDataHint");
+$("mData").oninput = () => controllaDataAnomala($("mData").value, "mDataHint");
+
+// ---------- form ----------
+// Categorie del rendiconto (ADS): entrate vs uscite.
+const CAT_USCITE = ["Spese sanitarie","Alimentari","Casa e utenze","Assistenza/badante","Abbigliamento e igiene","Trasporti","Tempo libero/varie","Imposte e spese bancarie","Altro"];
+const CAT_ENTRATE = ["Pensione","Indennità di accompagnamento","Altre prestazioni/indennità","Rendite/interessi","Rimborsi","Altro"];
+let tipoCorrente = "Uscita";
+function popolaCategorie(selId, tipo, valore){
+  const sel = $(selId);
+  if (!sel) return;
+  const lista = tipo === "Entrata" ? CAT_ENTRATE : CAT_USCITE;
+  sel.innerHTML = "";
+  lista.forEach(c => { const o = document.createElement("option"); o.value = o.textContent = c; sel.appendChild(o); });
+  sel.value = (valore && lista.indexOf(valore) !== -1) ? valore : "Altro";
+}
+
+// Form per una USCITA compilata dall'AI (da scansione foto/PDF)
+function preparaForm(dati){
+  tipoCorrente = "Uscita";
+  $("badgeTipo").textContent = "USCITA";
+  $("badgeTipo").style.background = "var(--verde)";
+  $("badgeAi").classList.toggle("nascosto", !dati);
+  $("rigaDocEntrata").classList.add("nascosto");
+  popolaCategorie("fCategoria", "Uscita", dati?.categoria);
+  $("fData").value = dati?.data || "";
+  controllaDataAnomala($("fData").value, "fDataHint");
+  $("fTotale").value = dati?.totale || "";
+  $("fNegozio").value = dati?.negozio || "";
+  $("fNote").value = "";
+  stato.testoAi = dati?.testo || "";
+  stato.bancomatB64 = null;
+  stato.bancomatIsPdf = false;
+  $("bancomatAnteprima").classList.add("nascosto");
+  $("bancomatPdfBadge").classList.add("nascosto");
+  $("formErrore").classList.add("nascosto");
+}
+
+// Form per una ENTRATA manuale (nessuna scansione)
+function preparaFormEntrata(){
+  tipoCorrente = "Entrata";
+  stato = { fotoB64: null, pdfB64: null, bancomatB64: null, bancomatIsPdf: false, testoAi: "" };
+  $("badgeTipo").textContent = "ENTRATA";
+  $("badgeTipo").style.background = "var(--navy)";
+  $("badgeAi").classList.add("nascosto");
+  $("fotoAnteprima").classList.add("nascosto");
+  $("etichettaPdf").classList.add("nascosto");
+  $("rigaDocEntrata").classList.remove("nascosto");
+  $("docEntrataAnteprima").classList.add("nascosto");
+  $("docEntrataPdfBadge").classList.add("nascosto");
+  popolaCategorie("fCategoria", "Entrata", "");
+  $("fData").value = "";
+  $("fDataHint").classList.add("nascosto");
+  $("fTotale").value = "";
+  $("fNegozio").value = "";
+  $("fNote").value = "";
+  $("bancomatAnteprima").classList.add("nascosto");
+  $("bancomatPdfBadge").classList.add("nascosto");
+  $("formErrore").classList.add("nascosto");
+  mostra("vistaForm");
+}
+$("btnEntrata").onclick = preparaFormEntrata;
+
+// Allega giustificativo per un'entrata manuale (foto→jpeg o PDF)
+$("btnDocEntrata").onclick = () => $("inputDocEntrata").click();
+$("inputDocEntrata").onchange = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const mini = $("docEntrataAnteprima"), badge = $("docEntrataPdfBadge");
+  try {
+    if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)){
+      if (pdfTroppoGrande(file)) return;
+      stato.pdfB64 = await fileInBase64(file);
+      stato.fotoB64 = null;
+      mini.classList.add("nascosto");
+      badge.classList.remove("nascosto");
+    } else {
+      const canvas = await caricaImmagine(file);
+      stato.fotoB64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+      stato.pdfB64 = null;
+      mini.src = "data:image/jpeg;base64," + stato.fotoB64;
+      mini.classList.remove("nascosto");
+      badge.classList.add("nascosto");
+    }
+  } catch (err) { alert("Errore: " + err.message); }
+};
+
+$("btnBancomat").onclick = () => $("inputBancomat").click();
+
+$("inputBancomat").onchange = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const mini = $("bancomatAnteprima"), badge = $("bancomatPdfBadge");
+  try {
+    if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)){
+      if (pdfTroppoGrande(file)) return;
+      stato.bancomatB64 = await fileInBase64(file);
+      stato.bancomatIsPdf = true;
+      mini.classList.add("nascosto");
+      badge.classList.remove("nascosto");
+    } else {
+      const canvas = await caricaImmagine(file);
+      stato.bancomatB64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+      stato.bancomatIsPdf = false;
+      mini.src = "data:image/jpeg;base64," + stato.bancomatB64;
+      mini.classList.remove("nascosto");
+      badge.classList.add("nascosto");
+    }
+  } catch (err) {
+    alert("Errore: " + err.message);
+  }
+};
+
+$("btnAnnulla").onclick = () => mostra("vistaHome");
+
+$("btnSalva").onclick = async () => {
+  const btn = $("btnSalva");
+  btn.disabled = true;
+  $("formErrore").classList.add("nascosto");
+  try {
+    const corpo = {
+      action: "salva",
+      tipo: tipoCorrente,
+      foto: stato.fotoB64,
+      fotoMime: "image/jpeg",
+      pdf: stato.pdfB64,
+      data: $("fData").value,
+      totale: $("fTotale").value,
+      negozio: $("fNegozio").value,
+      categoria: $("fCategoria").value,
+      note: $("fNote").value,
+      testo: stato.testoAi
+    };
+    if (stato.bancomatB64){
+      if (stato.bancomatIsPdf) corpo.pdfBancomat = stato.bancomatB64;
+      else { corpo.fotoBancomat = stato.bancomatB64; corpo.fotoBancomatMime = "image/jpeg"; }
+    }
+    let r = await api(corpo);
+    // possibile doppio invio: stessa data+totale+negozio già nel foglio
+    if (!r.ok && r.duplicato){
+      if (!confirm("⚠️ " + r.errore + "\n\nSalvare comunque?")) return; // resta nel form
+      corpo.forzaDuplicato = true;
+      r = await api(corpo);
+    }
+    if (!r.ok) throw new Error(r.errore || "Salvataggio fallito");
+    const banner = $("bannerOk");
+    banner.textContent = "✅ " + (tipoCorrente === "Entrata" ? "Entrata" : "Uscita") + " salvata (riga " + r.riga + ")";
+    banner.classList.remove("nascosto");
+    setTimeout(() => banner.classList.add("nascosto"), 5000);
+    mostra("vistaHome");
+  } catch (err) {
+    const el = $("formErrore");
+    el.textContent = err.message;
+    el.classList.remove("nascosto");
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+// ---------- modifica di una spesa già salvata ----------
+// spesa = oggetto restituito da "cerca" (con .riga); origine = vista di provenienza
+let modifica = { riga: null, fotoB64: null, fotoIsPdf: false, bancomatB64: null, bancomatIsPdf: false, testoAi: null, origine: "vistaHome" };
+
+function apriModifica(spesa, origine){
+  modifica = { riga: spesa.riga, fotoB64: null, fotoIsPdf: false, bancomatB64: null, bancomatIsPdf: false, testoAi: null, origine,
+               // ID univoco = chiave primaria (se presente il backend risolve
+               // la riga per ID); impronta data+totale come fallback legacy
+               id: spesa.id || "",
+               rifData: spesa.data || "", rifTotale: spesa.totale || "" };
+  $("mData").value = spesa.data || "";
+  controllaDataAnomala($("mData").value, "mDataHint");
+  $("mTotale").value = spesa.totale || "";
+  $("mNegozio").value = spesa.negozio || "";
+  const tipoMov = spesa.tipo === "Entrata" ? "Entrata" : "Uscita";
+  $("mTipo").value = tipoMov;
+  popolaCategoriaModifica(tipoMov, spesa.categoria);
+  $("mNote").value = spesa.note || "";
+  $("mFotoAnteprima").classList.add("nascosto");
+  $("mFotoPdfBadge").classList.add("nascosto");
+  $("mBancomatAnteprima").classList.add("nascosto");
+  $("mBancomatPdfBadge").classList.add("nascosto");
+  $("mBadgeAi").classList.add("nascosto");
+  $("mErrore").classList.add("nascosto");
+  mostra("vistaModifica");
+  mostraAllegati(spesa);
+}
+
+// Popola le categorie di Modifica in base al Tipo; mantiene una categoria
+// storica fuori elenco se presente.
+function popolaCategoriaModifica(tipo, valore){
+  const sel = $("mCategoria");
+  popolaCategorie("mCategoria", tipo, valore);
+  if (valore && ![...sel.options].some(o => o.value === valore)){
+    const o = document.createElement("option");
+    o.value = o.textContent = valore;
+    sel.appendChild(o);
+    sel.value = valore;
+  }
+}
+$("mTipo").onchange = () => popolaCategorie("mCategoria", $("mTipo").value, "");
+
+// link per aprire su Drive gli allegati della spesa (risolti su richiesta)
+async function mostraAllegati(spesa){
+  const box = $("mAllegati");
+  box.innerHTML = "";
+  box.classList.add("nascosto");
+  if (!spesa.haAllegati) return;
+  box.innerHTML = '<span class="centro" style="color:var(--grigio);font-size:.8rem">📎 allegati…</span>';
+  box.classList.remove("nascosto");
+  try {
+    const r = await api({ action: "allegati", riga: spesa.riga });
+    // la spesa aperta potrebbe essere cambiata nel frattempo
+    if (modifica.riga !== spesa.riga) return;
+    if (r.ok && r.allegati && r.allegati.length){
+      box.innerHTML = "";
+      r.allegati.forEach(a => {
+        const link = document.createElement("a");
+        link.href = a.url;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = a.etichetta;
+        box.appendChild(link);
+      });
+    } else {
+      box.classList.add("nascosto");
+    }
+  } catch (err) {
+    box.classList.add("nascosto");
+  }
+}
+
+// imposta la categoria nel select gestendo eventuali categorie storiche fuori elenco
+function impostaCategoriaModifica(cat){
+  popolaCategoriaModifica($("mTipo").value, cat);
+}
+
+// ri-scansiona con l'AI la nuova immagine/PDF dello scontrino e aggiorna i campi
+async function riscansionaScontrinoModifica(){
+  const badge = $("mBadgeAi");
+  badge.textContent = "🔄 Ri-scansione AI in corso…";
+  badge.classList.remove("nascosto");
+  try {
+    const corpo = { action: "analizza" };
+    if (modifica.fotoIsPdf) corpo.pdf = modifica.fotoB64;
+    else { corpo.foto = modifica.fotoB64; corpo.fotoMime = "image/jpeg"; }
+    const r = await api(corpo);
+    if (r.ok && r.dati){
+      const d = r.dati;
+      if (d.data){ $("mData").value = d.data; controllaDataAnomala(d.data, "mDataHint"); }
+      if (d.totale)  $("mTotale").value = d.totale;
+      if (d.negozio) $("mNegozio").value = d.negozio;
+      $("mTipo").value = "Uscita";   // una ri-scansione di scontrino è un'uscita
+      if (d.categoria) impostaCategoriaModifica(d.categoria);
+      modifica.testoAi = d.testo || "";
+      badge.textContent = "✨ Campi aggiornati dall'AI — verifica e salva";
+    } else {
+      badge.textContent = "⚠️ Ri-scansione non riuscita: correggi i campi a mano";
+    }
+  } catch (err) {
+    badge.textContent = "⚠️ Ri-scansione non riuscita: " + err.message;
+  }
+}
+
+$("btnMFoto").onclick = () => $("inputMFoto").click();
+$("btnMBancomat").onclick = () => $("inputMBancomat").click();
+
+// carica un nuovo allegato (foto o PDF) per scontrino/pagamento nella vista
+// modifica. Restituisce true se un file è stato effettivamente caricato.
+async function caricaNuovoAllegato(e, campoB64, campoPdf, anteprimaId, badgeId){
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return false;
+  const mini = $(anteprimaId), badge = $(badgeId);
+  try {
+    if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)){
+      if (pdfTroppoGrande(file)) return false;
+      modifica[campoB64] = await fileInBase64(file);
+      modifica[campoPdf] = true;
+      mini.classList.add("nascosto");
+      badge.classList.remove("nascosto");
+    } else {
+      const canvas = await caricaImmagine(file);
+      modifica[campoB64] = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+      modifica[campoPdf] = false;
+      mini.src = "data:image/jpeg;base64," + modifica[campoB64];
+      mini.classList.remove("nascosto");
+      badge.classList.add("nascosto");
+    }
+    return true;
+  } catch (err) {
+    alert("Errore: " + err.message);
+    return false;
+  }
+}
+
+// sostituendo lo SCONTRINO si ri-scansiona con l'AI e si aggiornano i campi
+$("inputMFoto").onchange = async (e) => {
+  const caricato = await caricaNuovoAllegato(e, "fotoB64", "fotoIsPdf", "mFotoAnteprima", "mFotoPdfBadge");
+  if (caricato) await riscansionaScontrinoModifica();
+};
+// il PAGAMENTO è solo prova di pagamento: niente ri-scansione
+$("inputMBancomat").onchange = (e) => caricaNuovoAllegato(e, "bancomatB64", "bancomatIsPdf", "mBancomatAnteprima", "mBancomatPdfBadge");
+
+$("btnAnnullaMod").onclick = () => mostra(modifica.origine);
+
+$("btnSalvaMod").onclick = async () => {
+  const btn = $("btnSalvaMod");
+  btn.disabled = true;
+  $("mErrore").classList.add("nascosto");
+  try {
+    const corpo = {
+      action: "aggiorna",
+      id: modifica.id,
+      riga: modifica.riga,
+      rifData: modifica.rifData,
+      rifTotale: modifica.rifTotale,
+      data: $("mData").value,
+      tipo: $("mTipo").value,
+      totale: $("mTotale").value,
+      negozio: $("mNegozio").value,
+      categoria: $("mCategoria").value,
+      note: $("mNote").value
+    };
+    if (modifica.fotoB64){
+      if (modifica.fotoIsPdf) corpo.pdf = modifica.fotoB64;
+      else { corpo.foto = modifica.fotoB64; corpo.fotoMime = "image/jpeg"; }
+    }
+    // trascrizione aggiornata: inviata solo dopo una ri-scansione dello scontrino
+    if (modifica.testoAi !== null && modifica.testoAi !== undefined) corpo.testo = modifica.testoAi;
+    if (modifica.bancomatB64){
+      if (modifica.bancomatIsPdf) corpo.pdfBancomat = modifica.bancomatB64;
+      else { corpo.fotoBancomat = modifica.bancomatB64; corpo.fotoBancomatMime = "image/jpeg"; }
+    }
+    const r = await api(corpo);
+    if (!r.ok) throw new Error(r.errore || "Aggiornamento fallito");
+    mostra(modifica.origine);
+    if (modifica.origine === "vistaElenco") caricaElenco();
+    const banner = $("bannerOk");
+    banner.textContent = "✅ Spesa aggiornata (riga " + r.riga + ")";
+    banner.classList.remove("nascosto");
+    setTimeout(() => banner.classList.add("nascosto"), 5000);
+  } catch (err) {
+    const el = $("mErrore");
+    el.textContent = err.message;
+    el.classList.remove("nascosto");
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+$("btnEliminaMod").onclick = async () => {
+  if (!confirm("Eliminare definitivamente questa spesa?\nI file collegati (foto, PDF) verranno spostati nel cestino.")) return;
+  const btn = $("btnEliminaMod");
+  btn.disabled = true;
+  $("mErrore").classList.add("nascosto");
+  try {
+    const r = await api({ action: "elimina", id: modifica.id, riga: modifica.riga, rifData: modifica.rifData, rifTotale: modifica.rifTotale });
+    if (!r.ok) throw new Error(r.errore || "Eliminazione fallita");
+    mostra(modifica.origine);
+    // i numeri di riga in cache cambiano dopo la cancellazione: ricarico l'elenco
+    if (modifica.origine === "vistaElenco") caricaElenco();
+    else if (modifica.origine === "vistaCerca") $("btnCerca").onclick();
+    const banner = $("bannerOk");
+    banner.textContent = "🗑️ Spesa eliminata";
+    banner.classList.remove("nascosto");
+    setTimeout(() => banner.classList.add("nascosto"), 5000);
+  } catch (err) {
+    const el = $("mErrore");
+    el.textContent = err.message;
+    el.classList.remove("nascosto");
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+// ---------- elenco spese del mese (tabella a schermo) ----------
+function parseEuro(t){
+  return parseFloat(String(t).replace("€", "").replace(/\./g, "").replace(",", ".")) || 0;
+}
+function formattaEuro(n){
+  return "€ " + n.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" });
+}
+
+$("btnVaiElenco").onclick = () => {
+  const oggi = new Date();
+  $("elencoMese").value = oggi.getFullYear() + "-" + String(oggi.getMonth() + 1).padStart(2, "0");
+  mostra("vistaElenco");
+  caricaElenco();
+};
+$("elencoMese").onchange = () => caricaElenco();
+$("btnIndietroElenco").onclick = () => mostra("vistaHome");
+
+async function caricaElenco(){
+  const box = $("boxElenco");
+  box.innerHTML = '<p class="centro"><span class="spinner-mini"></span> caricamento…</p>';
+  try {
+    const r = await api({ action: "cerca", query: "", periodo: $("elencoMese").value });
+    if (!r.ok) throw new Error(r.errore || "Errore");
+    if (!r.spese.length){
+      box.innerHTML = '<p class="centro">Nessun movimento in questo mese</p>';
+      return;
+    }
+    const tab = document.createElement("table");
+    tab.className = "tabella-spese";
+    tab.innerHTML = "<thead><tr><th>Data</th><th>Descrizione</th><th class='num'>Importo</th></tr></thead><tbody></tbody>";
+    const corpo = tab.querySelector("tbody");
+    let entrate = 0, uscite = 0;
+    r.spese.forEach(s => {
+      const entrata = s.tipo === "Entrata";
+      const imp = (s.importoNum != null) ? s.importoNum : parseEuro(s.totale);
+      if (entrata) entrate += imp; else uscite += imp;
+      const tr = document.createElement("tr");
+      const tdData = document.createElement("td"); tdData.textContent = s.data.slice(0, 5);
+      const tdDesc = document.createElement("td"); tdDesc.textContent = s.negozio || "N/D";
+      const tdImp = document.createElement("td"); tdImp.className = "num";
+      tdImp.textContent = (entrata ? "+ " : "− ") + s.totale;
+      tdImp.style.color = entrata ? "var(--verde)" : "var(--rosso)";
+      tr.appendChild(tdData); tr.appendChild(tdDesc); tr.appendChild(tdImp);
+      tr.onclick = () => apriModifica(s, "vistaElenco");
+      corpo.appendChild(tr);
+    });
+    const saldo = entrate - uscite;
+    const addPiede = (label, val, color) => {
+      const p = document.createElement("tr");
+      p.className = "riga-totale";
+      p.innerHTML = "<td colspan='2'></td><td class='num'></td>";
+      p.querySelector("td").textContent = label;
+      const n = p.querySelector(".num");
+      n.textContent = val;
+      if (color) n.style.color = color;
+      corpo.appendChild(p);
+    };
+    addPiede("Entrate", "+ " + formattaEuro(entrate), "var(--verde)");
+    addPiede("Uscite", "− " + formattaEuro(uscite), "var(--rosso)");
+    addPiede("Saldo del mese", (saldo < 0 ? "− " : "") + formattaEuro(Math.abs(saldo)), "var(--navy)");
+    box.innerHTML = "";
+    box.appendChild(tab);
+    const hint = document.createElement("p");
+    hint.className = "hint-modifica";
+    hint.textContent = "Tocca un movimento per modificarlo";
+    box.appendChild(hint);
+  } catch (err) {
+    box.innerHTML = "";
+    const p = document.createElement("p");
+    p.className = "errore";
+    p.textContent = "❌ " + err.message;
+    box.appendChild(p);
+  }
+}
+
+// ---------- ricerca ----------
+$("btnVaiCerca").onclick = () => {
+  $("cardRisultati").classList.add("nascosto");
+  mostra("vistaCerca");
+};
+$("btnIndietroCerca").onclick = () => mostra("vistaHome");
+
+$("btnCerca").onclick = async () => {
+  const btn = $("btnCerca");
+  btn.disabled = true;
+  btn.textContent = "Ricerca in corso…";
+  try {
+    const periodo = $("cercaMese").value;  // formato "YYYY-MM" nativo dell'input month
+    const r = await api({ action: "cerca", query: $("cercaQuery").value, periodo: periodo });
+    if (!r.ok) throw new Error(r.errore || "Ricerca fallita");
+    const lista = $("listaRisultati");
+    lista.innerHTML = "";
+    $("risultatiTitolo").textContent = r.spese.length
+      ? `Risultati (${r.spese.length}${r.spese.length === 50 ? ", mostro i più recenti" : ""})`
+      : "Nessuna spesa trovata";
+    let somma = 0;
+    r.spese.forEach(s => {
+      somma += parseEuro(s.totale);
+      const div = document.createElement("div");
+      div.className = "voce-lista";
+      div.dataset.riga = s.riga;
+      div.innerHTML = `<div class="vl-info"><div class="vl-negozio"></div>
+        <div class="vl-sub"></div></div><div class="vl-tot"></div>`;
+      div.querySelector(".vl-negozio").textContent = s.negozio || "N/D";
+      div.querySelector(".vl-sub").textContent = s.data + " • " + s.categoria;
+      div.querySelector(".vl-tot").textContent = s.totale;
+      div.onclick = () => apriModifica(s, "vistaCerca");
+      lista.appendChild(div);
+    });
+    if (r.spese.length > 1){
+      const totDiv = document.createElement("div");
+      totDiv.className = "voce-lista";
+      totDiv.innerHTML = `<div class="vl-info"><div class="vl-negozio">TOTALE</div></div><div class="vl-tot"></div>`;
+      totDiv.querySelector(".vl-tot").textContent = formattaEuro(somma);
+      lista.appendChild(totDiv);
+    }
+    $("cardRisultati").classList.remove("nascosto");
+  } catch (err) {
+    alert("Errore: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Cerca";
+  }
+};
+
+// ---------- chiusura mese ----------
+$("btnVaiMese").onclick = () => {
+  popolaSelettoriMese();
+  mostra("vistaMese");
+  caricaRiepiloghi();
+};
+$("btnIndietroMese").onclick = () => mostra("vistaHome");
+
+function popolaSelettoriMese(){
+  const mesi = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
+                "Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+  const oggi = new Date();
+  // default: mese precedente
+  let mDef = oggi.getMonth(), yDef = oggi.getFullYear();
+  if (mDef === 0){ mDef = 12; yDef--; }
+  const mSel = $("meseSel");
+  mSel.innerHTML = "";
+  mesi.forEach((nome, i) => {
+    const o = document.createElement("option");
+    o.value = i + 1;
+    o.textContent = nome;
+    mSel.appendChild(o);
+  });
+  mSel.value = mDef;
+  const aSel = $("annoSel");
+  aSel.innerHTML = "";
+  for (let y = oggi.getFullYear(); y >= oggi.getFullYear() - 3; y--){
+    const o = document.createElement("option");
+    o.value = y;
+    o.textContent = y;
+    aSel.appendChild(o);
+  }
+  aSel.value = yDef;
+}
+
+function mostraLinkPdf(esito, url){
+  const a = document.createElement("a");
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.textContent = "📄 Apri il PDF";
+  a.style.cssText = "display:block;margin-top:8px;color:var(--verde);font-weight:700";
+  esito.appendChild(a);
+}
+
+// Cerca il PDF del periodo nell'archivio riepiloghi, riprovando a intervalli.
+// Serve a recuperare il report quando chiudi_mese va in timeout lato client ma
+// il server lo genera comunque.
+async function attendiRiepilogo(periodo, tentativi, intervalloMs){
+  for (let i = 0; i < tentativi; i++){
+    await new Promise(res => setTimeout(res, intervalloMs));
+    try {
+      const r = await api({ action: "riepiloghi" });
+      if (r && r.ok && r.riepiloghi){
+        const rp = r.riepiloghi.find(x => x.periodo === periodo);
+        if (rp && rp.url) return rp.url;
+      }
+    } catch(e){ /* offline momentaneo: riprovo */ }
+  }
+  return null;
+}
+
+let rendPeriodo = "mese";
+$("rendMese").onclick = () => { rendPeriodo = "mese"; $("rendMese").classList.add("seg-attivo"); $("rendAnno").classList.remove("seg-attivo"); $("rendBoxMese").classList.remove("nascosto"); };
+$("rendAnno").onclick = () => { rendPeriodo = "anno"; $("rendAnno").classList.add("seg-attivo"); $("rendMese").classList.remove("seg-attivo"); $("rendBoxMese").classList.add("nascosto"); };
+
+$("btnChiudiMese").onclick = async () => {
+  const btn = $("btnChiudiMese");
+  const esito = $("meseEsito");
+  const anno = $("annoSel").value;
+  const annuale = rendPeriodo === "anno";
+  const mese = annuale ? "" : $("meseSel").value;
+  const periodo = annuale ? String(anno) : anno + "-" + String(mese).padStart(2, "0");
+  btn.disabled = true;
+  esito.innerHTML = '<span class="spinner-mini"></span> Generazione in corso, attendi…';
+  try {
+    const r = await api({ action: "chiudi_mese", anno, mese });
+    if (!r.ok) throw new Error(r.errore || "Generazione fallita");
+    esito.textContent = r.messaggio;
+    if (r.pdfUrl) mostraLinkPdf(esito, r.pdfUrl);
+    caricaRiepiloghi();
+  } catch (err) {
+    // "Failed to fetch" = timeout di rete: il PDF è pesante (tante anteprime) e
+    // il browser molla prima che il server risponda, ma il server COMPLETA lo
+    // stesso. Attendo e recupero il report dall'archivio invece di dare errore.
+    esito.innerHTML = '<span class="spinner-mini"></span> Il server sta ancora generando il PDF (può richiedere 1–2 minuti)…';
+    const url = await attendiRiepilogo(periodo, 10, 15000);  // ~2,5 min
+    if (url){
+      esito.textContent = "✅ Rendiconto " + periodo + " pronto";
+      mostraLinkPdf(esito, url);
+    } else {
+      esito.textContent = "⚠️ Sta impiegando più del previsto. Il report sarà nell'archivio qui sotto tra poco: riapri questa schermata per aggiornarlo.";
+    }
+    caricaRiepiloghi();
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+async function caricaRiepiloghi(){
+  const box = $("listaRiepiloghi");
+  box.innerHTML = '<p class="centro"><span class="spinner-mini"></span> caricamento…</p>';
+  try {
+    const r = await api({ action: "riepiloghi" });
+    if (!r.ok) throw new Error(r.errore || "Errore");
+    if (!r.riepiloghi.length){
+      box.innerHTML = '<p class="centro">Nessun riepilogo ancora generato</p>';
+      return;
+    }
+    box.innerHTML = "";
+    r.riepiloghi.forEach(rp => {
+      const div = document.createElement("div");
+      div.className = "voce-lista";
+      div.innerHTML = `<div class="vl-info"><div class="vl-negozio"></div></div><a target="_blank" rel="noopener">📄 Apri PDF</a>`;
+      div.querySelector(".vl-negozio").textContent = rp.periodo;
+      div.querySelector("a").href = rp.url;
+      box.appendChild(div);
+    });
+  } catch (err) {
+    box.innerHTML = '<p class="errore">❌ ' + err.message + '</p>';
+  }
+}
+
+// ---------- statistiche (totali per categoria, periodo selezionabile) ----------
+$("btnVaiStat").onclick = () => {
+  const oggi = new Date();
+  $("statInputMese").value = oggi.getFullYear() + "-" + String(oggi.getMonth() + 1).padStart(2, "0");
+  // popola gli anni (corrente e 4 precedenti)
+  const aSel = $("statInputAnno");
+  aSel.innerHTML = "";
+  for (let y = oggi.getFullYear(); y >= oggi.getFullYear() - 4; y--){
+    const o = document.createElement("option");
+    o.value = o.textContent = y;
+    aSel.appendChild(o);
+  }
+  impostaModoStat(true);   // default: Mese
+  mostra("vistaStatistiche");
+  caricaStatistiche();
+};
+$("btnIndietroStat").onclick = () => mostra("vistaHome");
+
+function impostaModoStat(mese){
+  $("statMese").classList.toggle("seg-attivo", mese);
+  $("statAnno").classList.toggle("seg-attivo", !mese);
+  $("statBoxMese").classList.toggle("nascosto", !mese);
+  $("statBoxAnno").classList.toggle("nascosto", mese);
+}
+$("statMese").onclick = () => { impostaModoStat(true); caricaStatistiche(); };
+$("statAnno").onclick = () => { impostaModoStat(false); caricaStatistiche(); };
+$("statInputMese").onchange = () => caricaStatistiche();
+$("statInputAnno").onchange = () => caricaStatistiche();
+
+function statPeriodoCorrente(){
+  return $("statMese").classList.contains("seg-attivo")
+    ? $("statInputMese").value        // "yyyy-MM"
+    : $("statInputAnno").value;        // "yyyy"
+}
+
+async function caricaStatistiche(){
+  const box = $("boxStat");
+  const periodo = statPeriodoCorrente();
+  if (!periodo){ box.innerHTML = '<p class="centro">Scegli un periodo</p>'; return; }
+  box.innerHTML = '<p class="centro"><span class="spinner-mini"></span> caricamento…</p>';
+  try {
+    const r = await api({ action: "cerca", query: "", periodo: periodo });
+    if (!r.ok) throw new Error(r.errore || "Errore");
+    if (!r.spese.length){
+      box.innerHTML = '<p class="centro">Nessun movimento nel periodo</p>';
+      return;
+    }
+    // separa entrate/uscite; le barre sono sulle USCITE per categoria
+    let totEntrate = 0, totUscite = 0;
+    const perCat = {};
+    r.spese.forEach(s => {
+      const v = (s.importoNum != null) ? s.importoNum : parseEuro(s.totale);
+      if (s.tipo === "Entrata"){ totEntrate += v; }
+      else { totUscite += v; const cat = s.categoria || "Altro"; perCat[cat] = (perCat[cat] || 0) + v; }
+    });
+    const saldo = totEntrate - totUscite;
+
+    box.innerHTML = "";
+    const rie = document.createElement("div");
+    rie.className = "stat-riepilogo";
+    rie.innerHTML =
+      '<div class="sr-riga"><span>Entrate</span><span class="sr-ent">+ ' + formattaEuro(totEntrate) + '</span></div>' +
+      '<div class="sr-riga"><span>Uscite</span><span class="sr-usc">− ' + formattaEuro(totUscite) + '</span></div>' +
+      '<div class="sr-riga sr-saldo"><span>Saldo</span><span>' + (saldo < 0 ? "− " : "") + formattaEuro(Math.abs(saldo)) + '</span></div>';
+    box.appendChild(rie);
+
+    const voci = Object.entries(perCat).sort((a, b) => b[1] - a[1]);
+    if (voci.length){
+      const h = document.createElement("p");
+      h.className = "stat-sottotitolo";
+      h.textContent = "Uscite per categoria";
+      box.appendChild(h);
+      const maxVal = voci[0][1] || 1;
+      voci.forEach(([cat, val]) => {
+        const perc = totUscite ? Math.round(val / totUscite * 100) : 0;
+        const riga = document.createElement("div");
+        riga.className = "stat-cat";
+        riga.innerHTML =
+          '<div class="stat-barra"></div>' +
+          '<div class="stat-riga"><div class="stat-nome"></div><div class="stat-tot"></div></div>';
+        riga.querySelector(".stat-barra").style.width = Math.round(val / maxVal * 100) + "%";
+        const nome = riga.querySelector(".stat-nome");
+        nome.textContent = cat;
+        const percSpan = document.createElement("span");
+        percSpan.className = "stat-perc";
+        percSpan.textContent = perc + "%";
+        nome.appendChild(percSpan);
+        riga.querySelector(".stat-tot").textContent = formattaEuro(val);
+        box.appendChild(riga);
+      });
+    }
+  } catch (err) {
+    box.innerHTML = '<p class="errore">❌ ' + err.message + '</p>';
+  }
+}
+
+// ---------- impostazioni ----------
+$("btnHome").onclick = () => mostra("vistaHome");
+$("btnBack").onclick = () => mostra("vistaHome");
+function apriImpostazioni(){
+  $("cfgUrl").value = cfg.url;
+  $("cfgToken").value = cfg.token;
+  $("cfgEsito").textContent = "";
+  mostra("vistaImpostazioni");
+  aggiornaUsoApi();
+}
+
+// Card "Credito API" (stima dai token, non l'importo fatturato).
+// Il credito è persistente lato backend e si ricarica da qui.
+function renderUso(u){
+  const d = n => "$ " + Number(n || 0).toFixed(2);
+  const res = Number(u.creditoResiduo || 0);
+  const rif = Number(u.creditoRiferimento || 0);
+  $("usoResiduo").textContent = d(res);
+  $("usoConsumo").textContent = d(u.consumoMese);
+  const perc = rif > 0 ? Math.max(0, Math.min(100, Math.round(res / rif * 100))) : 0;
+  $("usoBarra").style.width = perc + "%";
+  const basso = res <= 0.5 || (rif > 0 && res / rif < 0.15);   // avviso "credito quasi finito"
+  $("usoBarra").style.background = basso ? "var(--rosso)" : "var(--navy)";
+  $("usoResiduo").style.color = basso ? "var(--rosso)" : "var(--navy)";
+  $("usoNota").textContent = "Stima dai token (mese " + u.periodo +
+    "), non l'importo fatturato. Il credito è persistente: ricaricalo quando aggiungi fondi su Anthropic.";
+}
+
+// Silenziosa: se il backend è vecchio o l'URL manca, la card resta nascosta.
+async function aggiornaUsoApi(){
+  const box = $("boxUso");
+  box.hidden = true;
+  if (!cfg.url) return;
+  try {
+    const r = await api({ action: "usage" });
+    if (!r || !r.ok || !r.usage) return;
+    renderUso(r.usage);
+    box.hidden = false;
+  } catch(e){ /* silenzioso: card nascosta */ }
+}
+
+async function ricaricaCredito(importo){
+  importo = parseFloat(String(importo).replace(",", "."));
+  if (!cfg.url || !(importo > 0)) return;
+  try {
+    const r = await api({ action: "ricarica", importo: importo });
+    if (r && r.ok && r.usage){
+      renderUso(r.usage);
+      $("boxUso").hidden = false;
+      $("usoImporto").value = "";
+    }
+  } catch(e){ alert("Ricarica non riuscita: " + e.message); }
+}
+$("btnRicarica").onclick  = () => ricaricaCredito($("usoImporto").value);
+$("btnRicarica5").onclick = () => ricaricaCredito(5);
+$("btnImpostazioni").onclick = apriImpostazioni;
+$("btnVaiImpostazioni").onclick = apriImpostazioni;
+
+$("btnSalvaCfg").onclick = async () => {
+  cfg.url = $("cfgUrl").value.trim();
+  cfg.token = $("cfgToken").value.trim();
+  const esito = $("cfgEsito");
+  esito.textContent = "Verifica in corso…";
+  try {
+    const r = await api({ action: "ping" });
+    esito.textContent = r.ok ? "✅ Connesso (backend v" + r.versione + ")" : "❌ " + (r.errore || "Errore");
+    if (r.ok){
+      verificaVersioneBackend(r.versione);
+      setTimeout(() => mostra("vistaHome"), 800);
+    }
+  } catch (err) {
+    esito.textContent = "❌ " + err.message;
+  }
+};
+
+// ---------- avvio ----------
+$("appVersione").textContent = APP.versione;
+$("appData").textContent = APP.data;
+$("linkChangelog").href = APP.changelog;
+
+if (!cfg.url) mostra("vistaImpostazioni");
+else {
+  mostra("vistaHome");
+  // controllo silenzioso in background dell'allineamento app/backend
+  api({ action: "ping" })
+    .then(r => { if (r.ok) verificaVersioneBackend(r.versione); })
+    .catch(() => {});
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
