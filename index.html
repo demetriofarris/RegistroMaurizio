@@ -241,6 +241,7 @@
     <div class="griglia-home">
       <button class="tile tile-primario" id="btnFoto"><span class="tile-icona">📷</span>Spesa da foto</button>
       <button class="tile" id="btnPdf"><span class="tile-icona">📄</span>Spesa da PDF</button>
+      <button class="tile" id="btnUscitaManuale"><span class="tile-icona">✍️</span>Spesa manuale</button>
       <button class="tile tile-entrata" id="btnEntrata"><span class="tile-icona">💶</span>Aggiungi entrata</button>
       <button class="tile" id="btnVaiElenco"><span class="tile-icona">📋</span>Movimenti del mese</button>
       <button class="tile" id="btnVaiCerca"><span class="tile-icona">🔍</span>Cerca</button>
@@ -313,8 +314,24 @@
     <label>Descrizione</label>
     <input id="fNegozio" type="text" placeholder="negozio o fonte (es. Pensione INPS)">
 
-    <label>Categoria</label>
-    <select id="fCategoria"></select>
+    <div class="riga-doppia">
+      <div>
+        <label>Categoria</label>
+        <select id="fCategoria"></select>
+      </div>
+      <div>
+        <label>Forma di pagamento</label>
+        <select id="fPagamento">
+          <option value="">— non indicata —</option>
+          <option>Contanti</option>
+          <option>Bancomat/Carta</option>
+          <option>Bonifico</option>
+          <option>Assegno</option>
+          <option>Addebito diretto</option>
+          <option>Altro</option>
+        </select>
+      </div>
+    </div>
 
     <label>Note</label>
     <textarea id="fNote" placeholder="facoltative"></textarea>
@@ -365,6 +382,17 @@
 
     <label>Descrizione</label>
     <input id="mNegozio" type="text">
+
+    <label>Forma di pagamento</label>
+    <select id="mPagamento">
+      <option value="">— non indicata —</option>
+      <option>Contanti</option>
+      <option>Bancomat/Carta</option>
+      <option>Bonifico</option>
+      <option>Assegno</option>
+      <option>Addebito diretto</option>
+      <option>Altro</option>
+    </select>
 
     <label>Note</label>
     <textarea id="mNote"></textarea>
@@ -492,7 +520,7 @@ const cfg = {
 
 // ---------- versione app ----------
 const APP = {
-  versione: "1.0.0",
+  versione: "1.1.0",
   data: "25/10/2026",
   changelog: "https://github.com/demetriofarris/RegistroMaurizio/blob/main/CHANGELOG.md"
 };
@@ -1001,6 +1029,7 @@ function preparaForm(dati){
   controllaDataAnomala($("fData").value, "fDataHint");
   $("fTotale").value = dati?.totale || "";
   $("fNegozio").value = dati?.negozio || "";
+  $("fPagamento").value = dati?.pagamento || "";
   $("fNote").value = "";
   stato.testoAi = dati?.testo || "";
   stato.bancomatB64 = null;
@@ -1010,30 +1039,33 @@ function preparaForm(dati){
   $("formErrore").classList.add("nascosto");
 }
 
-// Form per una ENTRATA manuale (nessuna scansione)
-function preparaFormEntrata(){
-  tipoCorrente = "Entrata";
+// Form per un movimento MANUALE (entrata o uscita, nessuna scansione)
+function preparaFormManuale(tipo){
+  tipoCorrente = (tipo === "Entrata") ? "Entrata" : "Uscita";
+  const entrata = tipoCorrente === "Entrata";
   stato = { fotoB64: null, pdfB64: null, bancomatB64: null, bancomatIsPdf: false, testoAi: "" };
-  $("badgeTipo").textContent = "ENTRATA";
-  $("badgeTipo").style.background = "var(--navy)";
+  $("badgeTipo").textContent = entrata ? "ENTRATA" : "USCITA (manuale)";
+  $("badgeTipo").style.background = entrata ? "var(--navy)" : "var(--verde)";
   $("badgeAi").classList.add("nascosto");
   $("fotoAnteprima").classList.add("nascosto");
   $("etichettaPdf").classList.add("nascosto");
   $("rigaDocEntrata").classList.remove("nascosto");
   $("docEntrataAnteprima").classList.add("nascosto");
   $("docEntrataPdfBadge").classList.add("nascosto");
-  popolaCategorie("fCategoria", "Entrata", "");
+  popolaCategorie("fCategoria", tipoCorrente, "");
   $("fData").value = "";
   $("fDataHint").classList.add("nascosto");
   $("fTotale").value = "";
   $("fNegozio").value = "";
+  $("fPagamento").value = "";
   $("fNote").value = "";
   $("bancomatAnteprima").classList.add("nascosto");
   $("bancomatPdfBadge").classList.add("nascosto");
   $("formErrore").classList.add("nascosto");
   mostra("vistaForm");
 }
-$("btnEntrata").onclick = preparaFormEntrata;
+$("btnEntrata").onclick = () => preparaFormManuale("Entrata");
+$("btnUscitaManuale").onclick = () => preparaFormManuale("Uscita");
 
 // Allega giustificativo per un'entrata manuale (foto→jpeg o PDF)
 $("btnDocEntrata").onclick = () => $("inputDocEntrata").click();
@@ -1104,6 +1136,7 @@ $("btnSalva").onclick = async () => {
       totale: $("fTotale").value,
       negozio: $("fNegozio").value,
       categoria: $("fCategoria").value,
+      pagamento: $("fPagamento").value,
       note: $("fNote").value,
       testo: stato.testoAi
     };
@@ -1150,6 +1183,7 @@ function apriModifica(spesa, origine){
   const tipoMov = spesa.tipo === "Entrata" ? "Entrata" : "Uscita";
   $("mTipo").value = tipoMov;
   popolaCategoriaModifica(tipoMov, spesa.categoria);
+  $("mPagamento").value = spesa.pagamento || "";
   $("mNote").value = spesa.note || "";
   $("mFotoAnteprima").classList.add("nascosto");
   $("mFotoPdfBadge").classList.add("nascosto");
@@ -1295,6 +1329,7 @@ $("btnSalvaMod").onclick = async () => {
       totale: $("mTotale").value,
       negozio: $("mNegozio").value,
       categoria: $("mCategoria").value,
+      pagamento: $("mPagamento").value,
       note: $("mNote").value
     };
     if (modifica.fotoB64){

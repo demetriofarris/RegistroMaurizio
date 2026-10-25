@@ -1,4 +1,4 @@
-const CACHE = "registro-v1";
+const CACHE = "registro-v2";
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {

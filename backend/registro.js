@@ -155,7 +155,7 @@ function getFoglioSpese_() {
 // (uscite) o fonte (entrate: es. "Pensione INPS"). Giustificativi: Foto/PDF
 // (documento principale) + FotoBancomat (prova di pagamento/accredito).
 const HEADERS_V4 = [
-  "Data", "Tipo", "Importo", "Categoria", "Descrizione",
+  "Data", "Tipo", "Importo", "Categoria", "Pagamento", "Descrizione",
   "Foto", "FotoBancomat", "PDF", "Testo_documento",
   "Note", "Alert_Data", "ID"
 ];
@@ -659,9 +659,10 @@ function estraiDatiConClaude(imageBlob){
       totale:    { type: "string", description: "Importo TOTALE pagato, formato '€ 12,34' con la virgola come separatore decimale. Stringa vuota se non leggibile." },
       negozio:   { type: "string", description: "Nome dell'esercizio/fornitore. Stringa vuota se non leggibile." },
       categoria: { type: "string", enum: ["Spese sanitarie", "Alimentari", "Casa e utenze", "Assistenza/badante", "Abbigliamento e igiene", "Trasporti", "Tempo libero/varie", "Imposte e spese bancarie", "Altro"] },
+      pagamento: { type: "string", description: "Forma di pagamento dedotta dallo scontrino: 'pagamento elettronico'/'POS'/'carta' → Bancomat/Carta; 'contante'/'contanti' → Contanti; bonifico → Bonifico; assegno → Assegno. Valori ammessi: Contanti, Bancomat/Carta, Bonifico, Assegno, Addebito diretto, Altro. Stringa vuota se non indicata." },
       testo:     { type: "string", description: "Trascrizione integrale del testo leggibile del documento." }
     },
-    required: ["data", "totale", "negozio", "categoria", "testo"],
+    required: ["data", "totale", "negozio", "categoria", "pagamento", "testo"],
     additionalProperties: false
   };
 
@@ -792,6 +793,21 @@ function ricaricaCredito_(importo){
   return leggiUsoApi_();
 }
 
+// Forma di pagamento: normalizza su un insieme fisso, altrimenti stringa vuota.
+const PAGAMENTI_VALIDI = ["Contanti", "Bancomat/Carta", "Bonifico", "Assegno", "Addebito diretto", "Altro"];
+function _normPagamento_(v){
+  const s = String(v || "").trim();
+  if (!s) return "";
+  if (PAGAMENTI_VALIDI.indexOf(s) !== -1) return s;
+  const l = s.toLowerCase();
+  if (l.indexOf("contant") !== -1) return "Contanti";
+  if (l.indexOf("carta") !== -1 || l.indexOf("bancomat") !== -1 || l.indexOf("pos") !== -1 || l.indexOf("elettronic") !== -1 || l.indexOf("debit") !== -1 || l.indexOf("credit") !== -1) return "Bancomat/Carta";
+  if (l.indexOf("bonific") !== -1) return "Bonifico";
+  if (l.indexOf("assegno") !== -1) return "Assegno";
+  if (l.indexOf("addebit") !== -1 || l.indexOf("rid") !== -1 || l.indexOf("sdd") !== -1) return "Addebito diretto";
+  return "";
+}
+
 // Normalizza/valida i campi prima di scriverli nel foglio
 function validaDatiEstratti(dati){
   if (!dati || typeof dati !== "object") return null;
@@ -818,6 +834,7 @@ function validaDatiEstratti(dati){
     totale: totale,
     negozio: String(dati.negozio || "").trim(),
     categoria: categoria,
+    pagamento: _normPagamento_(dati.pagamento),
     testo: String(dati.testo || "").trim(),
     tipo: "Uscita"   // l'estrazione AI è sempre per un giustificativo di spesa
   };
@@ -1007,6 +1024,7 @@ function chiudiMeseManuale(anno, mese){
         iTot           = _findCol(headers,["Importo","Totale"])-1,
         iNeg           = _findCol(headers,["Descrizione","Negozio","Fornitore"])-1,
         iCat           = _findCol(headers,["Categoria"])-1,
+        iPag           = _findCol(headers,["Pagamento"])-1,
         iFoto          = _findCol(headers,["Foto","Image"])-1,
         iFotoBancomat  = _findCol(headers,["FotoBancomat","Foto Bancomat"])-1,
         iPDF           = _findCol(headers,["PDF"])-1,
@@ -1044,6 +1062,7 @@ function chiudiMeseManuale(anno, mese){
     righe++;
     const cat     = iCat>=0 ? (r[iCat]||"Altro") : "Altro";
     const negozio = iNeg>=0 ? (r[iNeg]||"")      : "";
+    const pagamento = iPag>=0 ? String(r[iPag]||"").trim() : "";
     const note    = iNote>=0 ? String(r[iNote]||"").trim() : "";
 
     if (entrata){ totEntrate += num; sumCatE[cat] = (sumCatE[cat]||0) + num; }
@@ -1076,6 +1095,7 @@ function chiudiMeseManuale(anno, mese){
       tipo: entrata ? "Entrata" : "Uscita",
       negozio: negozio,
       categoria: cat,
+      pagamento: pagamento,
       importo: num,
       fileImg: fileImg,
       fileBancomat: fileBancomat,
@@ -1237,7 +1257,7 @@ function chiudiMeseManuale(anno, mese){
       .setSpacingBefore(4).setSpacingAfter(1);
     intestazione.editAsText().setForegroundColor(PDF_STY.NAVY);
 
-    const dettaglio = body.appendParagraph(`${v.categoria}    ·    ${formatEuro(v.importo)}`);
+    const dettaglio = body.appendParagraph(`${v.categoria}${v.pagamento ? "    ·    " + v.pagamento : ""}    ·    ${formatEuro(v.importo)}`);
     dettaglio.setFontFamily(PDF_STY.SANS).setFontSize(10).setSpacingAfter(4);
     dettaglio.editAsText().setForegroundColor(PDF_STY.GRIGIO);
 
@@ -1451,6 +1471,7 @@ function cercaSpese(p){
         iNeg  = _findCol(headers, ["Descrizione", "Negozio"]) - 1,
         iTipo = _findCol(headers, ["Tipo"]) - 1,
         iCat  = _findCol(headers, ["Categoria"]) - 1,
+        iPag  = _findCol(headers, ["Pagamento"]) - 1,
         iNote = _findCol(headers, ["Note"]) - 1,
         iFoto = _findCol(headers, ["Foto"]) - 1,
         iFotoBc = _findCol(headers, ["FotoBancomat", "Foto Bancomat"]) - 1,
@@ -1498,6 +1519,7 @@ function cercaSpese(p){
       importoNum: parseImporto(iTot >= 0 ? r[iTot] : 0),
       negozio: iNeg >= 0 ? String(r[iNeg] || "") : "",
       categoria: iCat >= 0 ? String(r[iCat] || "") : "",
+      pagamento: iPag >= 0 ? String(r[iPag] || "") : "",
       note: iNote >= 0 ? String(r[iNote] || "") : "",
       // flag economico (nessuna chiamata a Drive): gli URL veri si risolvono
       // solo su richiesta con l'azione "allegati"
@@ -1586,8 +1608,9 @@ function _cercaDuplicato_(sh, headers, p){
 
 function salvaSpesa(p){
   const sh = getFoglioSpese_();
-  _assicuraColonnaID_(sh);                       // garantisce la colonna ID
-  const headers = _assicuraColonna_(sh, "Tipo"); // e la colonna Tipo (Entrata/Uscita)
+  _assicuraColonnaID_(sh);                            // garantisce la colonna ID
+  _assicuraColonna_(sh, "Tipo");                      // e la colonna Tipo (Entrata/Uscita)
+  const headers = _assicuraColonna_(sh, "Pagamento"); // e la colonna Pagamento
 
   // Meglio un errore chiaro che una riga salvata vuota: se le intestazioni non
   // sono leggibili, tutti i setCol scarterebbero i valori in silenzio
@@ -1651,6 +1674,7 @@ function salvaSpesa(p){
   setCol(["Importo", "Totale"], String(p.totale || "").trim());
   setCol(["Descrizione", "Negozio"], String(p.negozio || "").trim());
   setCol(["Categoria"], String(p.categoria || "").trim());
+  setCol(["Pagamento"], _normPagamento_(p.pagamento));
   setCol(["Note"], String(p.note || "").trim());
   setCol(["Testo_documento", "Testo_scontrino", "Testo scontrino"], String(p.testo || "").trim());
   setCol(["ID"], Utilities.getUuid());  // chiave stabile della riga
@@ -1773,6 +1797,7 @@ function aggiornaSpesa(p){
     [["Importo", "Totale"], p.totale],
     [["Descrizione", "Negozio"], p.negozio],
     [["Categoria"], p.categoria],
+    [["Pagamento"], p.pagamento !== undefined ? _normPagamento_(p.pagamento) : undefined],
     [["Note"], p.note],
     [["Testo_documento", "Testo_scontrino", "Testo scontrino"], p.testo]
   ].forEach(([aliases, val]) => {
@@ -1931,7 +1956,7 @@ function doPost(e){
     }
 
     if (body.action === "ping"){
-      return out({ ok: true, versione: "1.0.0" });
+      return out({ ok: true, versione: "1.1.0" });
     }
 
     if (body.action === "usage"){
