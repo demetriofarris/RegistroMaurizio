@@ -75,5 +75,22 @@ Fatto. Da qui:
 ---
 
 ## Aggiornare il backend in futuro
-Quando il codice cambia: ricopia `backend/registro.js` nell'editor Apps Script, **Salva**, poi
-**Distribuisci → Gestisci distribuzioni → ✏️ (modifica) → Versione: Nuova versione → Distribuisci**.
+
+**Quando farlo:** quando in cima all'app compare un **banner giallo** del tipo
+*"⚠️ Backend v1.0.0 ≠ app v1.1.0 — ricopia registro.js…"*, oppure quando Demetrio segnala una nuova versione.
+Significa che il codice del backend è più vecchio dell'app: le novità non funzionano finché non si aggiorna.
+
+**Come farlo** (3 minuti, sull'account di Damiana):
+1. Apri l'editor **Apps Script** del progetto "Registro Maurizio".
+2. Nel file del codice: **seleziona tutto e cancella**, poi **incolla** la versione aggiornata di
+   `backend/registro.js`
+   (link diretto: **https://raw.githubusercontent.com/demetriofarris/RegistroMaurizio/main/backend/registro.js**).
+3. **Salva** (Ctrl+S).
+4. In alto a destra: **Distribuisci → Gestisci distribuzioni → ✏️ (icona matita)** →
+   alla voce **Versione** scegli **Nuova versione** → **Distribuisci**.
+
+**Importante:**
+- **NON** serve rieseguire `setupNuovoAmbiente` e **NON** si toccano le Script Properties: la chiave API, il token
+  e tutte le impostazioni **restano**.
+- I **dati del foglio restano intatti**. Eventuali colonne nuove (es. "Pagamento") si **creano da sole** al primo salvataggio.
+- Verifica infine in **⚙️ Impostazioni → Salva e verifica**: il banner deve sparire e la versione del backend coincidere con quella dell'app.

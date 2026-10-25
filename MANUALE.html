@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manuale d'uso — Registro Maurizio</title>
+<style>
+  :root{
+    --navy:#1F3A5F; --navy-chiaro:#E6EBF2; --verde:#1B5E20; --rosso:#C62828;
+    --bg:#F4F6F4; --card:#FFFFFF; --testo:#1A1A1A; --grigio:#5F6B7A; --bordo:#DDE3E8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14181c; --card:#1e242b; --testo:#eaeef2; --grigio:#9aa7b4; --bordo:#2c343d; --navy-chiaro:#243244; }
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--testo);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; line-height:1.5;
+    padding:0 16px 56px; }
+  .wrap{ max-width:720px; margin:0 auto; }
+  header.top{ background:var(--navy); color:#fff; margin:0 -16px 20px; padding:22px 16px; }
+  header.top h1{ margin:0; font-size:1.4rem; }
+  header.top p{ margin:4px 0 0; color:#cdd6e2; font-size:.9rem; }
+  h2{ color:var(--navy); font-size:1.15rem; margin:28px 0 6px; display:flex; align-items:center; gap:8px; }
+  @media (prefers-color-scheme: dark){ h2{ color:#9db8de; } }
+  .card{ background:var(--card); border:1px solid var(--bordo); border-radius:14px; padding:16px 18px; margin:10px 0; }
+  ol, ul{ margin:8px 0; padding-left:22px; }
+  li{ margin:6px 0; }
+  .chip{ display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:.9rem;
+    padding:4px 11px; border-radius:99px; background:var(--navy-chiaro); color:var(--navy);
+    white-space:nowrap; }
+  @media (prefers-color-scheme: dark){ .chip{ color:#cfe0f5; } }
+  .chip.verde{ background:var(--verde); color:#fff; }
+  .chip.navy{ background:var(--navy); color:#fff; }
+  .legenda{ display:flex; flex-wrap:wrap; gap:8px; }
+  .nota{ background:var(--navy-chiaro); border-radius:12px; padding:12px 14px; font-size:.92rem; color:var(--testo); }
+  .nota.giallo{ background:#FFF3CD; color:#6b5600; }
+  @media (prefers-color-scheme: dark){ .nota.giallo{ background:#3a3418; color:#e8d98a; } }
+  .passo{ font-weight:700; color:var(--verde); }
+  @media (prefers-color-scheme: dark){ .passo{ color:#7fd48a; } }
+  .toc{ font-size:.95rem; }
+  .toc a{ color:var(--navy); text-decoration:none; }
+  @media (prefers-color-scheme: dark){ .toc a{ color:#9db8de; } }
+  code{ background:var(--navy-chiaro); padding:1px 6px; border-radius:6px; font-size:.9em; }
+  @media (prefers-color-scheme: dark){ code{ background:#243244; } }
+  .pie{ text-align:center; color:var(--grigio); font-size:.8rem; margin-top:30px; }
+  strong.v{ color:var(--verde); } strong.r{ color:var(--rosso); }
+  @media (prefers-color-scheme: dark){ strong.v{ color:#7fd48a; } strong.r{ color:#ef9a9a; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>📒 Registro Maurizio — Manuale d'uso</h1>
+    <p>Come registrare spese ed entrate ogni giorno e generare il rendiconto</p>
+  </header>
+
+  <div class="card toc">
+    <strong>In questa guida:</strong>
+    <ol style="margin-top:6px">
+      <li><a href="#aprire">Aprire l'app</a></li>
+      <li><a href="#spesa-foto">Registrare una spesa da scontrino (foto/PDF)</a></li>
+      <li><a href="#spesa-manuale">Registrare una spesa a mano</a></li>
+      <li><a href="#entrata">Registrare un'entrata</a></li>
+      <li><a href="#movimenti">Vedere i movimenti e il saldo</a></li>
+      <li><a href="#correggere">Correggere o eliminare un movimento</a></li>
+      <li><a href="#rendiconto">Generare il rendiconto (PDF)</a></li>
+      <li><a href="#statistiche">Statistiche</a></li>
+      <li><a href="#promemoria">Promemoria utili</a></li>
+      <li><a href="#problemi">Se qualcosa non va</a></li>
+    </ol>
+  </div>
+
+  <h2 id="aprire">1 · Aprire l'app</h2>
+  <div class="card">
+    <p>Apri dal telefono: <code>demetriofarris.github.io/RegistroMaurizio</code></p>
+    <p>Per averla come un'app vera: menu del browser → <strong>«Aggiungi a schermata Home»</strong>. Comparirà l'icona 📒 "Registro".</p>
+    <p class="nota">La prima volta inserisci URL e token in <span class="chip">⚙️ Impostazioni</span> (te li ha configurati chi ha installato l'app). Una volta fatto, non serve più.</p>
+  </div>
+
+  <h2 id="spesa-foto">2 · Spesa da scontrino (foto o PDF)</h2>
+  <div class="card">
+    <p>È il modo più veloce: fotografi lo scontrino e i dati si compilano da soli.</p>
+    <ol>
+      <li>In home tocca <span class="chip verde">📷 Spesa da foto</span> (oppure <span class="chip">📄 Spesa da PDF</span> se lo hai già in PDF, es. dallo scanner di Google Files).</li>
+      <li>Scatta/scegli l'immagine o il PDF dello scontrino.</li>
+      <li>Attendi qualche secondo: l'<strong>AI compila</strong> data, importo, descrizione, categoria e forma di pagamento (badge <em>«✨ compilato dall'AI — verifica»</em>).</li>
+      <li><span class="passo">Controlla sempre</span> che <strong>data</strong> e <strong>importo</strong> siano giusti (correggili se serve).</li>
+      <li>Facoltativo: aggiungi la <strong>prova di pagamento/accredito</strong> (foto o PDF del bancomat).</li>
+      <li>Tocca <span class="chip verde">💾 Salva movimento</span>.</li>
+    </ol>
+    <p class="nota">Lo scontrino fotografato resta allegato e comparirà nel rendiconto come giustificativo.</p>
+  </div>
+
+  <h2 id="spesa-manuale">3 · Spesa a mano (senza scontrino)</h2>
+  <div class="card">
+    <p>Per una spesa in contanti senza ricevuta, o quando preferisci scrivere tu.</p>
+    <ol>
+      <li>Tocca <span class="chip">✍️ Spesa manuale</span>.</li>
+      <li>Compila: <strong>Data</strong> (GG/MM/AAAA), <strong>Importo</strong>, <strong>Descrizione</strong>, <strong>Categoria</strong> e <strong>Forma di pagamento</strong>.</li>
+      <li>Facoltativo: allega un giustificativo (📎 Allega) e/o la prova di pagamento.</li>
+      <li>Tocca <span class="chip verde">💾 Salva movimento</span>.</li>
+    </ol>
+  </div>
+
+  <h2 id="entrata">4 · Entrata (pensione, indennità…)</h2>
+  <div class="card">
+    <ol>
+      <li>Tocca <span class="chip navy">💶 Aggiungi entrata</span>.</li>
+      <li>Compila: <strong>Data</strong>, <strong>Importo</strong>, <strong>Descrizione</strong> (la fonte, es. «Pensione INPS»), <strong>Categoria</strong> (Pensione, Indennità di accompagnamento, …) e <strong>Forma di pagamento</strong> (es. Bonifico).</li>
+      <li>Facoltativo: allega il giustificativo (es. cedolino o accredito).</li>
+      <li>Tocca <span class="chip verde">💾 Salva movimento</span>.</li>
+    </ol>
+  </div>
+
+  <h2 id="movimenti">5 · Movimenti e saldo del mese</h2>
+  <div class="card">
+    <p>Tocca <span class="chip">📋 Movimenti del mese</span>: vedi l'elenco con gli importi in <strong class="v">verde (entrate, +)</strong> e <strong class="r">rosso (uscite, −)</strong>, e in fondo il riepilogo:</p>
+    <ul>
+      <li><strong>Entrate</strong> del mese, <strong>Uscite</strong> del mese, e <strong>Saldo del mese</strong> (entrate − uscite).</li>
+    </ul>
+    <p>In alto puoi cambiare il mese da visualizzare.</p>
+  </div>
+
+  <h2 id="correggere">6 · Correggere o eliminare</h2>
+  <div class="card">
+    <ol>
+      <li>Apri <span class="chip">📋 Movimenti del mese</span> oppure <span class="chip">🔍 Cerca</span>.</li>
+      <li><strong>Tocca il movimento</strong> da sistemare.</li>
+      <li>Modifica i campi (puoi cambiare anche Tipo e Forma di pagamento) → <span class="chip verde">💾 Salva modifiche</span>.</li>
+      <li>Per cancellarlo: <strong class="r">🗑️ Elimina movimento</strong> (chiede conferma).</li>
+    </ol>
+  </div>
+
+  <h2 id="rendiconto">7 · Generare il rendiconto (PDF)</h2>
+  <div class="card">
+    <ol>
+      <li>Tocca <span class="chip">📊 Rendiconto</span>.</li>
+      <li>Scegli <strong>Mensile</strong> o <strong>Annuale</strong> e il periodo (mese/anno).</li>
+      <li>Tocca <span class="chip verde">🖨️ Genera rendiconto PDF</span> e attendi (può richiedere fino a un minuto).</li>
+      <li>Al termine compare <strong>📄 Apri il PDF</strong>. Lo trovi anche in «🗂️ Rendiconti generati» qui sotto.</li>
+    </ol>
+    <p class="nota">Il PDF contiene: elenco movimenti con colonne <strong>Entrate/Uscite</strong>, <strong>saldo iniziale → finale</strong>, riepilogo per categoria, i giustificativi, i riferimenti del procedimento e lo spazio per la <strong>firma</strong>. È il documento da conservare/allegare per il Giudice Tutelare.</p>
+  </div>
+
+  <h2 id="statistiche">8 · Statistiche</h2>
+  <div class="card">
+    <p>Tocca <span class="chip">📈 Statistiche</span>: vedi totale <strong>Entrate</strong>, <strong>Uscite</strong>, <strong>Saldo</strong> e le <strong>uscite per categoria</strong> (con barre), per mese o per anno.</p>
+  </div>
+
+  <h2 id="promemoria">9 · Promemoria utili</h2>
+  <div class="card">
+    <ul>
+      <li>📸 Fotografa lo scontrino <strong>appena fai la spesa</strong>: è il momento più comodo.</li>
+      <li>🔎 Dopo la scansione <strong>verifica sempre data e importo</strong> prima di salvare.</li>
+      <li>📅 La data si scrive <strong>GG/MM/AAAA</strong> (es. 05/09/2026). Se è lontana da oggi, l'app ti avvisa in rosso: controlla l'anno.</li>
+      <li>💶 Il <strong>saldo</strong> è calcolato in automatico: non serve inserirlo.</li>
+      <li>🧾 Non serve conservare altrove gli scontrini già allegati: finiscono nel rendiconto.</li>
+    </ul>
+  </div>
+
+  <h2 id="problemi">10 · Se qualcosa non va</h2>
+  <div class="card">
+    <ul>
+      <li><strong>«Failed to fetch» generando il rendiconto</strong> → non è un errore: il documento è pesante, il server sta ancora lavorando. Attendi 1–2 minuti: il PDF comparirà in «🗂️ Rendiconti generati».</li>
+      <li><strong>Errore 404 / lentezza con rete debole</strong> → riprova tra poco; l'app ritenta da sola le letture.</li>
+      <li><strong>Non compaiono i dati / «Configura prima l'URL»</strong> → vai in ⚙️ Impostazioni e premi «Salva e verifica».</li>
+    </ul>
+    <p class="nota giallo">⚠️ Se in cima compare un <strong>banner giallo</strong> «Backend ≠ app», avvisa Demetrio: va aggiornato lo script (operazione da fare una volta, i dati non si toccano).</p>
+  </div>
+
+  <div class="pie">Registro Maurizio · manuale d'uso · aggiornato il 25/10/2026</div>
+
+</div>
+</body>
+</html>
